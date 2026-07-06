@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Screen extends Model
 {
-  use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'cinema_id',
@@ -23,4 +23,9 @@ class Screen extends Model
         'capacity'  => 'integer',
         'is_active' => 'boolean',
     ];
+
+    public function cinema()
+    {
+        return $this->belongsTo(Cinema::class);
+    }
 }

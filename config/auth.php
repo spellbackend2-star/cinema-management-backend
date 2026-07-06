@@ -46,10 +46,7 @@ return [
             'driver' => 'passport',
             'provider' => 'users',
         ],
-        'staff' => [
-            'driver' => 'session',
-            'provider' => 'staff',
-        ],
+        
     ],
 
     /*
@@ -75,10 +72,6 @@ return [
             'model' => env('AUTH_MODEL', User::class),
         ],
 
-        'staff' => [
-            'driver' => 'eloquent',
-            'model' => App\Models\Staff::class,
-        ],
     ],
 
 

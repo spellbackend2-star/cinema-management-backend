@@ -17,17 +17,18 @@ class RoleSeeder extends Seeder
 
         // Staff roles (Staff guard)
         $staffRoles = [
-            'super_admin',
+        
             'company_admin',
             'branch_manager',
             'ticket_counter',
             'cashier',
         ];
 
+       
         foreach ($staffRoles as $role) {
             Role::firstOrCreate([
                 'name' => $role,
-                'guard_name' => 'staff',
+                'guard_name' => 'api',
             ]);
         }
     }

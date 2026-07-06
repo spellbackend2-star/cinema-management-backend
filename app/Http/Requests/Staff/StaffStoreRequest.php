@@ -9,17 +9,19 @@ class StaffStoreRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+         return $this->user()->hasRole('company_admin');
     }
 
     public function rules(): array
     {
+        $loggedInUser = $this->user();
+
         return [
             'name' => ['required', 'string', 'max:150'],
             'email' => ['required', 'email', 'max:255', 'unique:users,email'],
             'phone' => ['nullable', 'string', 'max:20'],
             'password' => ['required', 'string', 'min:8'],
-            'hired_on' => ['nullable', 'date'],
+            
 
             'role' => [
                 'required',
@@ -27,8 +29,11 @@ class StaffStoreRequest extends FormRequest
                 Rule::in($this->assignableRoles()),
             ],
 
-            // company_admin is the top of the hierarchy — nobody sets company_id manually
-            'company_id' => ['prohibited'],
+            'company_id' => [
+                $loggedInUser->hasRole('company_admin') ? 'nullable' : 'prohibited',
+                'integer',
+                'exists:companies,id',
+            ],
 
             'cinema_id' => ['nullable', 'integer', 'exists:cinemas,id'],
 
@@ -40,16 +45,22 @@ class StaffStoreRequest extends FormRequest
     {
         return [
             'email.unique' => 'Email already exists.',
-            'company_id.prohibited' => 'Company is assigned automatically and cannot be set manually.',
+            'company_id.prohibited' => 'You are not allowed to set the company for this staff member.',
         ];
     }
 
     /**
-     * Roles a company_admin is allowed to create via this endpoint.
-     * "customer" is intentionally excluded — customers are not staff.
+     * Roles the current user is allowed to assign.
      */
     private function assignableRoles(): array
     {
-        return ['ticket_counter', 'cashier'];
+        $user = $this->user();
+
+       
+        if ($user->hasRole('company_admin')) {
+            return ['Branch_manager', 'cashier', 'ticket_checker'];
+        }
+
+        return [];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Repositories\Eloquent;
 
+use App\Models\Staff;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -25,7 +26,15 @@ class AuthRepository implements AuthRepositoryInterface
             ->where('email', $email)
             ->first();
     }
-   
+    public function findUserByEmail(string $email)
+    {
+        return User::where('email', $email)->first();
+    }
+
+    public function findStaffByEmail(string $email)
+    {
+        return Staff::where('email', $email)->first();
+    }
 
     public function updatePassword(User $user, string $password): User
     {

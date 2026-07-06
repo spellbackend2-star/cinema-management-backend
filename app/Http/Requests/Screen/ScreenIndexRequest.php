@@ -5,7 +5,7 @@ namespace App\Http\Requests\Screen;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class ScreenUpdateRequest extends FormRequest
+class ScreenIndexRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -20,25 +20,14 @@ class ScreenUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
-        $screen = $this->route('screen');
-
         return [
             'cinema_id' => [
-                'required',
+                'nullable',
                 'exists:cinemas,id',
             ],
 
-            'name' => [
-                'required',
-                'string',
-                'max:50',
-                Rule::unique('screens')
-                    ->ignore($screen)
-                    ->where(fn ($query) => $query->where('cinema_id', $this->cinema_id)),
-            ],
-
             'screen_type' => [
-                'required',
+                'nullable',
                 Rule::in([
                     'STANDARD',
                     'IMAX',
@@ -49,22 +38,22 @@ class ScreenUpdateRequest extends FormRequest
                 ]),
             ],
 
-            'capacity' => [
-                'required',
-                'integer',
-                'min:1',
-                'max:1000',
-            ],
-
-            'sound_system' => [
-                'nullable',
-                'string',
-                'max:50',
-            ],
-
             'is_active' => [
                 'nullable',
                 'boolean',
+            ],
+
+            'filter' => [
+                'nullable',
+                'string',
+                'max:100',
+            ],
+
+            'per_page' => [
+                'nullable',
+                'integer',
+                'min:1',
+                'max:100',
             ],
         ];
     }

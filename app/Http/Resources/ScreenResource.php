@@ -14,6 +14,16 @@ class ScreenResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'cinema_id' => $this->cinema_id,
+            'name' => $this->name,
+            'screen_type' => $this->screen_type,
+            'capacity' => $this->capacity,
+            'sound_system' => $this->sound_system,
+            'is_active' => (bool) $this->is_active,
+            'created_at' => $this->created_at,
+            'updated_at' => $this->updated_at,
+        ];
     }
 }

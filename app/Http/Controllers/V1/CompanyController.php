@@ -27,6 +27,7 @@ class CompanyController extends Controller
 
     public function store(CompanyStoreRequest $request)
     {
+
         $company = $this->service->store($request->validated());
 
         return $this->successResponse(

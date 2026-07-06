@@ -40,6 +40,11 @@ class Cinema extends Model
     {
         return $this->belongsTo(Company::class);
     }
+    public function screens()
+    {
+        return $this->hasMany(Screen::class);
+    }
+
     public function users()
     {
         return $this->hasMany(User::class);

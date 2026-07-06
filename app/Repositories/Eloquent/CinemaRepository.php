@@ -12,22 +12,30 @@ class CinemaRepository extends BaseRepository implements CinemaRepositoryInterfa
     {
         $query = Cinema::query()->latest();
 
+        // Search
         $query = $this->applyFilter(
             $query,
             $filters,
             [
                 'name',
                 'address',
-                'phone',
+                'contact_number',
                 'email',
             ]
         );
+        $query = $this->applyExactFilters(
+            $query,
+            $filters,
+            [
+                'company_id',
+                'city',
+                'country',
+                'is_active',
+            ]
+        );
 
-       
-
-        return $query->paginate($query, $filters);
+        return $this->paginate($query, $filters);
     }
-
     public function find(int $id)
     {
         return Cinema::findOrFail($id);

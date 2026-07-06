@@ -12,7 +12,7 @@ class PermissionSeeder extends Seeder
     {
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
-        $guard = ['api', 'staff'];
+        $guard = 'api';
 
         $modules = [
             'user',
@@ -47,6 +47,8 @@ class PermissionSeeder extends Seeder
             'report',
             'dashboard',
             'profile',
+
+            'staff', // add staff as a normal module too, if you want staff.view/create/update/delete generated automatically
         ];
 
         $actions = [
@@ -56,50 +58,44 @@ class PermissionSeeder extends Seeder
             'delete',
         ];
 
-        foreach (['staff','api'] as $guard) {
-
-            foreach ($modules as $module) {
-
-                foreach ($actions as $action) {
-
-                    Permission::firstOrCreate([
-                        'name' => "{$module}.{$action}",
-                        'guard_name' => $guard,
-                    ]);
-                }
-            }
-
-            $extraPermissions = [
-
-                'booking.checkout',
-                'booking.confirm',
-                'booking.cancel',
-
-                'seat.lock',
-                'seat.unlock',
-
-                'ticket.print',
-                'ticket.download',
-                'ticket.scan',
-
-                'payment.process',
-                'payment.refund',
-
-                'report.sales',
-                'report.booking',
-                'report.revenue',
-
-                'role.assign',
-                'permission.assign',
-            ];
-
-            foreach ($extraPermissions as $permission) {
-
+        foreach ($modules as $module) {
+            foreach ($actions as $action) {
                 Permission::firstOrCreate([
-                    'name' => $permission,
+                    'name' => "{$module}.{$action}",
                     'guard_name' => $guard,
                 ]);
             }
+        }
+
+        $extraPermissions = [
+
+            'booking.checkout',
+            'booking.confirm',
+            'booking.cancel',
+
+            'seat.lock',
+            'seat.unlock',
+
+            'ticket.print',
+            'ticket.download',
+            'ticket.scan',
+
+            'payment.process',
+            'payment.refund',
+
+            'report.sales',
+            'report.booking',
+            'report.revenue',
+
+            'role.assign',
+            'permission.assign',
+        ];
+
+        foreach ($extraPermissions as $permission) {
+            Permission::firstOrCreate([
+                'name' => $permission,
+                'guard_name' => $guard,
+            ]);
         }
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();

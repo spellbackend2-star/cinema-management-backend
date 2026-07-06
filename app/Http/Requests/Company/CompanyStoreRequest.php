@@ -29,6 +29,11 @@ class CompanyStoreRequest extends FormRequest
             'phone' => 'nullable|string|max:20|filled|unique:companies,phone',
             'logo_url' => 'nullable|url|max:500',
             'pan_vat_no' => 'nullable|string|max:50|unique:companies,pan_vat_no',
+            'owner_details' => 'nullable|array',
+            'owner_details.name' => 'required_with:owner_details|string|max:100',
+            'owner_details.email' => 'required_with:owner_details|email|max:150|unique:users,email',
+            'owner_details.phone' => 'nullable|string|max:20|filled|unique:users,phone',
+            'owner_details.password' => 'required_with:owner_details|string|min:8|max:255|confirmed',
             'is_active' => 'boolean',
         ];
     }

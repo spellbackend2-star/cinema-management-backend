@@ -18,7 +18,6 @@ abstract class BaseRepository
                 foreach ($searchable as $column) {
                     $q->orWhere($column, 'like', "%{$filters['filter']}%");
                 }
-
             });
         }
 
@@ -32,5 +31,19 @@ abstract class BaseRepository
         return $query->paginate(
             $filters['per_page'] ?? 10
         );
+    }
+    
+    protected function applyExactFilters(
+        Builder $query,
+        array $filters,
+        array $filterable = []
+    ): Builder {
+        foreach ($filterable as $column) {
+            if (array_key_exists($column, $filters) && $filters[$column] !== '') {
+                $query->where($column, $filters[$column]);
+            }
+        }
+
+        return $query;
     }
 }

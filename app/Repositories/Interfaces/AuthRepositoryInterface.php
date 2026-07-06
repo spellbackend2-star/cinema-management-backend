@@ -12,10 +12,12 @@ interface AuthRepositoryInterface
 
     public function getResetToken(string $email);
 
+    public function findUserByEmail(string $email);
 
+    public function findStaffByEmail(string $email);
 
-    public function updatePassword(User $user, string $password):User;
-    
+    public function updatePassword(User $user, string $password): User;
+
 
     public function deleteResetToken(string $email);
 }
