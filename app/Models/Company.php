@@ -25,10 +25,11 @@ class Company extends Model
     ];
 
     // One company has many cinemas
-    public function company()
+    public function cinemas()
     {
-        return $this->belongsTo(Company::class);
+        return $this->hasMany(Cinema::class);
     }
+
 
     // One company has many users
     public function users()

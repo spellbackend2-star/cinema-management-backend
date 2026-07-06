@@ -7,53 +7,42 @@ use Illuminate\Validation\Rule;
 
 class ScreenUpdateRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return true;
+        return true; // tighten if only company_admin/cinema_admin should update
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     */
     public function rules(): array
     {
-        $screen = $this->route('screen');
+        $screenId = $this->route('screen'); // adjust if your route param differs
 
         return [
-            'cinema_id' => [
-                'required',
-                'exists:cinemas,id',
-            ],
-
             'name' => [
+                'sometimes',
                 'required',
                 'string',
                 'max:50',
-                Rule::unique('screens')
-                    ->ignore($screen)
-                    ->where(fn ($query) => $query->where('cinema_id', $this->cinema_id)),
+                Rule::unique('screens', 'name')
+                    ->where(fn ($query) => $query->where(
+                        'cinema_id',
+                        $this->input('cinema_id') ?? $this->route('screen')?->cinema_id
+                    ))
+                    ->ignore($screenId),
             ],
 
             'screen_type' => [
+                'sometimes',
                 'required',
-                Rule::in([
-                    'STANDARD',
-                    'IMAX',
-                    '3D',
-                    '4DX',
-                    'DOLBY_ATMOS',
-                    'RECLINER_HALL',
-                ]),
+                'string',
+                Rule::in(['STANDARD', 'IMAX', '3D', '4DX', 'DOLBY_ATMOS', 'RECLINER_HALL']),
             ],
 
             'capacity' => [
+                'sometimes',
                 'required',
                 'integer',
                 'min:1',
-                'max:1000',
+                'max:2000',
             ],
 
             'sound_system' => [
@@ -63,9 +52,22 @@ class ScreenUpdateRequest extends FormRequest
             ],
 
             'is_active' => [
-                'nullable',
+                'sometimes',
                 'boolean',
             ],
+
+            // cinema_id intentionally NOT accepted here — moving a screen to a
+            // different cinema is a sensitive structural change (would orphan
+            // its existing seats/sessions). Add a dedicated endpoint if needed.
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'name.unique' => 'A screen with this name already exists in this cinema.',
+            'screen_type.in' => 'Invalid screen type selected.',
+            'capacity.max' => 'Capacity seems unrealistically high — please verify.',
         ];
     }
 }

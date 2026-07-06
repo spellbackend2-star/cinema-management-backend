@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\User;
 use App\Repositories\Interfaces\CompanyRepositoryInterface;
 use App\Repositories\Interfaces\StaffRepositoryInterface;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
@@ -29,7 +30,6 @@ class StaffService
     {
         return DB::transaction(function () use ($data, $loggedInUser) {
 
-           
             $role = $data['role'];
             unset($data['role']);
 
@@ -37,10 +37,7 @@ class StaffService
 
             $data['parent_id'] = $loggedInUser->id;
 
-            if (empty($data['company_id'])) {
-                $data['company_id'] = $loggedInUser->company_id;
-            }
-
+           
             if (empty($data['cinema_id'])) {
                 $data['cinema_id'] = $loggedInUser->cinema_id;
             }

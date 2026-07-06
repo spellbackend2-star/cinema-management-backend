@@ -35,6 +35,7 @@ class CompanyService
             $staff =  $this->staffRepository->create($data['owner_details']);
             $staff->assignRole('company_admin');
         }
+       
         return $company;
     }
 

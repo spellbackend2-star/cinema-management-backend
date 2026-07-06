@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests\Staff;
+namespace App\Http\Requests\Screen;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class StaffStoreRequest extends FormRequest
+class ScreenStoreRequest extends FormRequest
 {
     public function authorize(): bool
     {
@@ -15,41 +15,53 @@ class StaffStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:150'],
-            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
-            'phone' => ['nullable', 'string', 'max:20'],
-            'password' => ['required', 'string', 'min:8'],
-            'hired_on' => ['nullable', 'date'],
-
-            'role' => [
+            'cinema_id' => [
                 'required',
-                'string',
-                Rule::in($this->assignableRoles()),
+                'integer',
+                'exists:cinemas,id',
             ],
 
-            // company_admin is the top of the hierarchy — nobody sets company_id manually
-            'company_id' => ['prohibited'],
+            'name' => [
+                'required',
+                'string',
+                'max:50',
+                Rule::unique('screens', 'name')->where(
+                    fn ($query) => $query->where('cinema_id', $this->input('cinema_id'))
+                ),
+            ],
 
-            'cinema_id' => ['nullable', 'integer', 'exists:cinemas,id'],
+            'screen_type' => [
+                'required',
+                'string',
+                Rule::in(['STANDARD', 'IMAX', '3D', '4DX', 'DOLBY_ATMOS', 'RECLINER_HALL']),
+            ],
 
-            'is_active' => ['boolean'],
+            'capacity' => [
+                'required',
+                'integer',
+                'min:1',
+                'max:2000',
+            ],
+
+            'sound_system' => [
+                'nullable',
+                'string',
+                'max:50',
+            ],
+
+            'is_active' => [
+                'boolean',
+            ],
         ];
     }
 
     public function messages(): array
     {
         return [
-            'email.unique' => 'Email already exists.',
-            'company_id.prohibited' => 'Company is assigned automatically and cannot be set manually.',
+            'cinema_id.exists' => 'Selected cinema does not exist.',
+            'name.unique' => 'A screen with this name already exists in this cinema.',
+            'screen_type.in' => 'Invalid screen type selected.',
+            'capacity.max' => 'Capacity seems unrealistically high — please verify.',
         ];
-    }
-
-    /**
-     * Roles a company_admin is allowed to create via this endpoint.
-     * "customer" is intentionally excluded — customers are not staff.
-     */
-    private function assignableRoles(): array
-    {
-        return ['ticket_counter', 'cashier'];
     }
 }

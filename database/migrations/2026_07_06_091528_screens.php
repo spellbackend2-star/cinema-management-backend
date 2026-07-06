@@ -33,6 +33,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
 
             $table->timestamps();
+            $table->softDeletes();
 
             // Foreign key
             $table->foreign('cinema_id')

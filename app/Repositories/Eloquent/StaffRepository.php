@@ -45,6 +45,7 @@ class StaffRepository implements StaffRepositoryInterface
 
     public function create(array $data): User
     {
+      
         return User::create($data);
     }
 

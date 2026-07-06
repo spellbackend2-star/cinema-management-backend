@@ -23,10 +23,12 @@ class StaffStoreRequest extends FormRequest
             'password' => ['required', 'string', 'min:8'],
             
 
+            
             'role' => [
+                'sometimes',
                 'required',
                 'string',
-                Rule::in($this->assignableRoles()),
+                Rule::in(['Branch_manager', 'cashier', 'ticket_counter']), // matches assignableRoles, excludes customer + company_admin
             ],
 
             'company_id' => [

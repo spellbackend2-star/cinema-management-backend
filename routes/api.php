@@ -4,6 +4,8 @@ use App\Http\Controllers\V1\AuthController;
 use App\Http\Controllers\V1\CinemaController;
 use App\Http\Controllers\V1\CompanyController;
 use App\Http\Controllers\V1\ScreenController;
+use App\Http\Controllers\V1\SeatCategoryController;
+use App\Http\Controllers\V1\SeatController;
 use App\Http\Controllers\V1\StaffController;
 use Illuminate\Support\Facades\Route;
 
@@ -40,6 +42,10 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('screens', ScreenController::class);
 
          Route::apiResource('staff', StaffController::class);
+
+         Route::apiResource('seat-categories', SeatCategoryController::class);
+
+         Route::apiResource('seats', SeatController::class);
     });
     
 });

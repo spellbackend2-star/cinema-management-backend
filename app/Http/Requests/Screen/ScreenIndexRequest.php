@@ -3,58 +3,33 @@
 namespace App\Http\Requests\Screen;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class ScreenIndexRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return true;
+        return true; // tighten if index should be role-restricted
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     */
     public function rules(): array
     {
         return [
-            'cinema_id' => [
-                'nullable',
-                'exists:cinemas,id',
-            ],
+            'search'       => ['nullable', 'string', 'max:100'],
+            'cinema_id'    => ['nullable', 'integer', 'exists:cinemas,id'],
+            'screen_type'  => ['nullable', 'string', 'in:STANDARD,IMAX,3D,4DX,DOLBY_ATMOS,RECLINER_HALL'],
+            'is_active'    => ['nullable', 'boolean'],
+            'per_page'     => ['nullable', 'integer', 'min:1', 'max:100'],
+            'page'         => ['nullable', 'integer', 'min:1'],
+            'sort_by'      => ['nullable', 'in:id,name,capacity,created_at'],
+            'sort_order'   => ['nullable', 'in:asc,desc'],
+        ];
+    }
 
-            'screen_type' => [
-                'nullable',
-                Rule::in([
-                    'STANDARD',
-                    'IMAX',
-                    '3D',
-                    '4DX',
-                    'DOLBY_ATMOS',
-                    'RECLINER_HALL',
-                ]),
-            ],
-
-            'is_active' => [
-                'nullable',
-                'boolean',
-            ],
-
-            'filter' => [
-                'nullable',
-                'string',
-                'max:100',
-            ],
-
-            'per_page' => [
-                'nullable',
-                'integer',
-                'min:1',
-                'max:100',
-            ],
+    public function messages(): array
+    {
+        return [
+            'cinema_id.exists'   => 'Selected cinema does not exist.',
+            'screen_type.in'     => 'Invalid screen type selected.',
         ];
     }
 }

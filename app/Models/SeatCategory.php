@@ -4,11 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SeatCategory extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
+
     protected $fillable = [
         'screen_id',
         'name',
@@ -16,10 +16,13 @@ class SeatCategory extends Model
         'display_order',
     ];
 
-     protected $casts = [
-        'display_order' => 'integer',
-        'created_at' => 'datetime',
-        'updated_at' => 'datetime',
-        'deleted_at' => 'datetime',
-    ];
+    public function screen()
+    {
+        return $this->belongsTo(Screen::class);
+    }
+
+    public function seats()
+    {
+        return $this->hasMany(Seat::class);
+    }
 }

@@ -28,4 +28,8 @@ class Screen extends Model
     {
         return $this->belongsTo(Cinema::class);
     }
+    public function seatCategories()
+{
+    return $this->hasMany(SeatCategory::class);
+}
 }

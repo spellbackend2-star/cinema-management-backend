@@ -3,47 +3,71 @@
 namespace App\Http\Controllers\V1;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Seats\IndexSeatRequest;
+use App\Http\Requests\Seats\StoreSeatRequest;
+use App\Http\Requests\Seats\UpdateSeatRequest;
+use App\Http\Resources\SeatResource;
+use App\Services\SeatService;
+use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
 
 class SeatController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    use ResponseTrait;
+
+    public function __construct(
+        protected SeatService $service
+    ) {}
+
+    public function index(IndexSeatRequest $request)
     {
-        //
+        return SeatResource::collection(
+            $this->service->index($request->validated(), $request->user())
+        );
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(StoreSeatRequest $request)
     {
-        //
+        $seat = $this->service->store(
+            $request->validated(),
+            $request->user()
+        );
+
+        return $this->successResponse(
+            new SeatResource($seat),
+            'Seat created successfully.',
+            201
+        );
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(string $id, Request $request)
     {
-        //
+        return new SeatResource(
+            $this->service->show($id, $request->user())
+        );
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(UpdateSeatRequest $request, string $id)
     {
-        //
+        $seat = $this->service->update(
+            $id,
+            $request->validated(),
+            $request->user()
+        );
+
+        return $this->successResponse(
+            new SeatResource($seat),
+            'Seat updated successfully.'
+        );
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(string $id, Request $request)
     {
-        //
+        $this->service->destroy($id, $request->user());
+
+        return $this->successResponse(
+            null,
+            'Seat deleted successfully.'
+        );
     }
 }
