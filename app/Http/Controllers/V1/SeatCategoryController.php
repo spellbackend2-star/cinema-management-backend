@@ -22,9 +22,13 @@ class SeatCategoryController extends Controller
     public function index(IndexSeatCategoryRequest $request)
     {
         return SeatCategoryResource::collection(
-            $this->service->index($request->validated(), $request->user())
+            $this->service->index(
+                $request->validated(),
+                $request->user()
+            )
         );
     }
+
 
     public function store(StoreSeatCategoryRequest $request)
     {
@@ -33,41 +37,36 @@ class SeatCategoryController extends Controller
             $request->user()
         );
 
-        return $this->successResponse(
-            new SeatCategoryResource($seatCategory),
-            'Seat category created successfully.',
-            201
-        );
+        return new SeatCategoryResource($seatCategory);
     }
 
-    public function show(string $id, Request $request)
+
+    public function show(Request $request, int $id)
     {
         return new SeatCategoryResource(
             $this->service->show($id, $request->user())
         );
     }
 
-    public function update(UpdateSeatCategoryRequest $request, string $id)
-    {
-        $seatCategory = $this->service->update(
-            $id,
-            $request->validated(),
-            $request->user()
-        );
 
-        return $this->successResponse(
-            new SeatCategoryResource($seatCategory),
-            'Seat category updated successfully.'
+    public function update(UpdateSeatCategoryRequest $request, int $id)
+    {
+        return new SeatCategoryResource(
+            $this->service->update(
+                $id,
+                $request->validated(),
+                $request->user()
+            )
         );
     }
 
-    public function destroy(string $id, Request $request)
+
+    public function destroy(Request $request, int $id)
     {
         $this->service->destroy($id, $request->user());
 
-        return $this->successResponse(
-            null,
-            'Seat category deleted successfully.'
-        );
+        return response()->json([
+            'message' => 'Seat category deleted successfully.'
+        ]);
     }
 }

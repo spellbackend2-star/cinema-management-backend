@@ -30,7 +30,6 @@ class CompanyService
         if ($data['owner_details']) {
             $data['owner_details']['company_id'] = $company->id;
             $data['owner_details']['employee_code'] = 'EMP-' . $company->id . '-' . rand(1000, 9999);
-            $data['owner_details']['parent_id'] = Auth::user()->id;
 
             $staff =  $this->staffRepository->create($data['owner_details']);
             $staff->assignRole('company_admin');

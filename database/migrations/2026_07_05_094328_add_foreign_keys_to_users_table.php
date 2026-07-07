@@ -19,14 +19,9 @@ return new class extends Migration
                 ->nullOnDelete()
                 ->cascadeOnUpdate();
 
-            $table->foreign('parent_id')
-                ->references('id')->on('users')
-                ->nullOnDelete()
-                ->cascadeOnUpdate();
-
+            
             $table->index('company_id');
             $table->index('cinema_id');
-            $table->index('parent_id');
         });
     }
 
@@ -35,7 +30,6 @@ return new class extends Migration
         Schema::table('users', function (Blueprint $table) {
             $table->dropForeign(['company_id']);
             $table->dropForeign(['cinema_id']);
-            $table->dropForeign(['parent_id']);
         });
     }
 };

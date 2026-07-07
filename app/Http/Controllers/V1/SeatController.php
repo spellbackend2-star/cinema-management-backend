@@ -20,54 +20,57 @@ class SeatController extends Controller
     ) {}
 
     public function index(IndexSeatRequest $request)
-    {
-        return SeatResource::collection(
-            $this->service->index($request->validated(), $request->user())
-        );
-    }
-
-    public function store(StoreSeatRequest $request)
-    {
-        $seat = $this->service->store(
+{
+    return SeatResource::collection(
+        $this->service->index(
             $request->validated(),
             $request->user()
-        );
+        )
+    );
+}
 
-        return $this->successResponse(
-            new SeatResource($seat),
-            'Seat created successfully.',
-            201
-        );
-    }
+public function store(StoreSeatRequest $request)
+{
+    $seat = $this->service->store(
+        $request->validated(),
+        $request->user()
+    );
 
-    public function show(string $id, Request $request)
-    {
-        return new SeatResource(
-            $this->service->show($id, $request->user())
-        );
-    }
+    return $this->successResponse(
+        new SeatResource($seat),
+        'Seat created successfully.',
+        201
+    );
+}
 
-    public function update(UpdateSeatRequest $request, string $id)
-    {
-        $seat = $this->service->update(
-            $id,
-            $request->validated(),
-            $request->user()
-        );
+public function show(Request $request, int $id)
+{
+    return new SeatResource(
+        $this->service->show($id, $request->user())
+    );
+}
 
-        return $this->successResponse(
-            new SeatResource($seat),
-            'Seat updated successfully.'
-        );
-    }
+public function update(UpdateSeatRequest $request, int $id)
+{
+    $seat = $this->service->update(
+        $id,
+        $request->validated(),
+        $request->user()
+    );
 
-    public function destroy(string $id, Request $request)
-    {
-        $this->service->destroy($id, $request->user());
+    return $this->successResponse(
+        new SeatResource($seat),
+        'Seat updated successfully.'
+    );
+}
 
-        return $this->successResponse(
-            null,
-            'Seat deleted successfully.'
-        );
-    }
+public function destroy(Request $request, int $id)
+{
+    $this->service->destroy($id, $request->user());
+
+    return $this->successResponse(
+        null,
+        'Seat deleted successfully.'
+    );
+}
 }

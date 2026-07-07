@@ -31,13 +31,20 @@ class ScreenController extends Controller
 
     public function store(ScreenStoreRequest $request)
     {
+       
         $screen = $this->service->create($request->validated(), $request->user());
-        return $this->successResponse(new ScreenResource($screen), 'Screen created successfully.', 201);
+        return $this->successResponse(
+                new ScreenResource($screen),
+                'Screen created successfully.',
+                201
+            );
     }
 
-    public function show(string $id, Request $request)
+    public function show(Request $request, int $id)
     {
-        return new ScreenResource($this->service->find($id, $request->user()));
+        return new ScreenResource(
+            $this->service->find($id, $request->user())
+        );
     }
 
     public function update(ScreenUpdateRequest $request, string $id)

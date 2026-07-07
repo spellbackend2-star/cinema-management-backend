@@ -37,9 +37,7 @@ class ScreenService
 
     public function create(array $data, User $user)
     {
-        
-        $cinema = Cinema::findOrFail($data['cinema_id']);
-
+        $this->validateCinema($data['cinema_id'], $user);
 
         return $this->repository->create($data);
     }
@@ -62,11 +60,26 @@ class ScreenService
         return $this->repository->delete($id);
     }
 
+    private function validateCinema(int $cinemaId, User $user): void
+    {
+        $query = Cinema::where('id', $cinemaId);
+
+        if ($user->hasRole('company_admin')) {
+            $query->where('company_id', $user->company_id);
+        }
+
+        if ($user->hasRole('cinema_admin')) {
+            $query->where('id', $user->cinema_id);
+        }
+
+        $query->firstOrFail();
+    }
+
     private function authorize(Cinema $cinema, User $user): void
     {
         if (
             $user->hasRole('company_admin') &&
-            $user->company_id != $cinema->company_id
+            $user->company_id !== $cinema->company_id
         ) {
             throw new AuthorizationException(
                 'You cannot manage screens outside your company.'
@@ -75,7 +88,7 @@ class ScreenService
 
         if (
             $user->hasRole('cinema_admin') &&
-            $user->cinema_id != $cinema->id
+            $user->cinema_id !== $cinema->id
         ) {
             throw new AuthorizationException(
                 'You cannot manage screens for another cinema.'

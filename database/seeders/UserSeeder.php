@@ -16,6 +16,7 @@ class UserSeeder extends Seeder
                 'name' => 'Company Admin',
                 'employee_code' => 'EMP-0001',
                 'password' => Hash::make('Company@123'),
+           
                 'email_verified_at' => now(),
             ]
         );

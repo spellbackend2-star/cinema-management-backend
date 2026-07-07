@@ -17,12 +17,14 @@ class CinemaUpdateRequest extends FormRequest
         $cinema = $this->route('cinema');
 
         return [
-            'company_id'     => 'required|exists:companies,id',
+            'company_id' => 'required|exists:companies,id',
+
             'name' => [
                 'required',
                 'string',
                 'max:150',
                 Rule::unique('cinemas')
+                    ->ignore($cinema)
                     ->where(fn($query) => $query->where('company_id', $this->company_id)),
             ],
 
@@ -31,8 +33,10 @@ class CinemaUpdateRequest extends FormRequest
                 'string',
                 'max:150',
                 Rule::unique('cinemas')
+                    ->ignore($cinema)
                     ->where(fn($query) => $query->where('company_id', $this->company_id)),
             ],
+
             'address'        => 'required|string|max:300',
             'country'        => 'nullable|string|max:100',
             'city'           => 'required|string|max:100',

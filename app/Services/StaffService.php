@@ -35,7 +35,7 @@ class StaffService
 
             $data['password'] = Hash::make($data['password']);
 
-            $data['parent_id'] = $loggedInUser->id;
+            $data['company_id'] = $loggedInUser->id;
 
            
             if (empty($data['cinema_id'])) {

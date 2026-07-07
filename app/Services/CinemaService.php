@@ -2,7 +2,10 @@
 
 namespace App\Services;
 
+use App\Models\Cinema;
+use App\Models\Screen;
 use App\Repositories\Interfaces\CinemaRepositoryInterface;
+use Illuminate\Support\Facades\Auth;
 
 class CinemaService
 {
@@ -22,6 +25,7 @@ class CinemaService
 
     public function create(array $data)
     {
+        $data['company_id'] = Auth::user()->company_id;
         return $this->repository->create($data);
     }
 

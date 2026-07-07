@@ -17,10 +17,10 @@ class CinemaResource extends JsonResource
         return [
              'id' => $this->id,
             'company_id' => $this->company_id,
-            'city_id' => $this->city_id,
+            'city' => $this->city,
             'name' => $this->name,
             'address' => $this->address,
-            'phone' => $this->phone,
+            'contact_number' => $this->contact_number,
             'email' => $this->email,
             'description' => $this->description,
             'status' => $this->status,

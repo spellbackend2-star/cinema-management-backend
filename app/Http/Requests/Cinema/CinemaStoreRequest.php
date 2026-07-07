@@ -16,7 +16,6 @@ class CinemaStoreRequest extends FormRequest
         return [
             'company_id'     => 'required|exists:companies,id',
             'name'           => 'required|string|max:150',
-            'slug'           => 'required|string|max:150',
             'address'        => 'required|string|max:300',
             'country'        => 'nullable|string|max:100',
             'city'           => 'required|string|max:100',

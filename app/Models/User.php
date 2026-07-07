@@ -12,7 +12,6 @@ class User extends Authenticatable
     use HasFactory, Notifiable, HasApiTokens, HasRoles;
 
     protected $fillable = [
-        'parent_id',
         'company_id',
         'cinema_id',
         'employee_code',
@@ -37,16 +36,7 @@ class User extends Authenticatable
         ];
     }
 
-    public function parent()
-    {
-        return $this->belongsTo(User::class, 'parent_id');
-    }
-
-    public function children()
-    {
-        return $this->hasMany(User::class, 'parent_id');
-    }
-
+   
     public function company()
     {
         return $this->belongsTo(Company::class);

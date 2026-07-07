@@ -7,21 +7,24 @@ use App\Repositories\Interfaces\SeatRepositoryInterface;
 
 class SeatRepository implements SeatRepositoryInterface
 {
-    public function index(array $filters=[])
+    public function index(array $filters = [])
     {
-        $query = Seat::with(['screen','category']);
+        $query = Seat::with(['screen', 'category']);
 
         if (!empty($filters['screen_id'])) {
-            $query->where('screen_id',$filters['screen_id']);
+            $query->where('screen_id', $filters['screen_id']);
         }
 
         if (!empty($filters['category_id'])) {
-            $query->where('category_id',$filters['category_id']);
+            $query->where('category_id', $filters['category_id']);
         }
 
         if (!empty($filters['company_id'])) {
-            $query->whereHas('screen',function($q) use($filters){
-                $q->where('company_id',$filters['company_id']);
+            $query->whereHas('screen', function ($q) use ($filters) {
+                // Fix: Get company_id through screen → cinema → company
+                $q->whereHas('cinema', function ($q2) use ($filters) {
+                    $q2->where('company_id', $filters['company_id']);
+                });
             });
         }
 
@@ -33,7 +36,7 @@ class SeatRepository implements SeatRepositoryInterface
 
     public function find(int $id)
     {
-        return Seat::with(['screen','category'])->findOrFail($id);
+        return Seat::with(['screen', 'category'])->findOrFail($id);
     }
 
     public function create(array $data)
@@ -41,9 +44,17 @@ class SeatRepository implements SeatRepositoryInterface
         return Seat::create($data);
     }
 
-    public function update(int $id,array $data)
+    // In SeatRepository.php
+    public function findByPosition($screenId, $rowLabel, $seatNumber)
     {
-        $seat=$this->find($id);
+        return Seat::where('screen_id', $screenId)
+            ->where('row_label', $rowLabel)
+            ->where('seat_number', $seatNumber)
+            ->first();
+    }
+    public function update(int $id, array $data)
+    {
+        $seat = $this->find($id);
 
         $seat->update($data);
 
