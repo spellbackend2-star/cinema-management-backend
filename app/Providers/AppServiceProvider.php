@@ -5,6 +5,8 @@ namespace App\Providers;
 use App\Repositories\Eloquent\CompanyRepository;
 use App\Repositories\Eloquent\AuthRepository;
 use App\Repositories\Eloquent\CinemaRepository;
+use App\Repositories\Eloquent\LangaugeRepository;
+use App\Repositories\Eloquent\MovieRepository;
 use App\Repositories\Eloquent\ScreenRepository;
 use App\Repositories\Eloquent\SeatCategoryRepository;
 use App\Repositories\Eloquent\SeatRepository;
@@ -12,6 +14,7 @@ use App\Repositories\Eloquent\StaffRepository;
 use App\Repositories\Interfaces\AuthRepositoryInterface;
 use App\Repositories\Interfaces\CinemaRepositoryInterface;
 use App\Repositories\Interfaces\CompanyRepositoryInterface;
+use App\Repositories\Interfaces\MovieRepositoryInterface;
 use App\Repositories\Interfaces\ScreenRepositoryInterface;
 use App\Repositories\Interfaces\SeatCategoryRepositoryInterface;
 use App\Repositories\Interfaces\SeatRepositoryInterface;
@@ -45,20 +48,27 @@ class AppServiceProvider extends ServiceProvider
             StaffRepositoryInterface::class,
             StaffRepository::class
         );
-         $this->app->bind(
+        $this->app->bind(
             ScreenRepositoryInterface::class,
             ScreenRepository::class
         );
         $this->app->bind(
-        SeatCategoryRepositoryInterface::class,
-        SeatCategoryRepository::class
-    );
-      $this->app->bind(
-        SeatRepositoryInterface::class,
-        SeatRepository::class
-    );
-      
+            SeatCategoryRepositoryInterface::class,
+            SeatCategoryRepository::class
+        );
+        $this->app->bind(
+            SeatRepositoryInterface::class,
+            SeatRepository::class
+        );
+
+        $this->app->bind(
+            MovieRepositoryInterface::class,
+            MovieRepository::class
+        );
+       
     }
+
+
 
     /**
      * Bootstrap any application services.
