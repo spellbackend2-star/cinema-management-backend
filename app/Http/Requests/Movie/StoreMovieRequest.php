@@ -4,6 +4,7 @@ namespace App\Http\Requests\Movie;
 
 use Carbon\Carbon;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreMovieRequest extends FormRequest
 {
@@ -15,7 +16,14 @@ class StoreMovieRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|string|max:200',
+            'title' => [
+                'required',
+                'string',
+                'max:200',
+                Rule::unique('movies')->where(function ($query) {
+                    return $query->whereDate('release_date', $this->release_date);
+                }),
+            ],
             'original_title' => 'nullable|string|max:200',
             'description' => 'nullable|string',
 
@@ -68,17 +76,23 @@ class StoreMovieRequest extends FormRequest
             'genres.*' => 'exists:genres,id',
 
 
-               // Languages (movie_languages)
-            // 'languages' => 'required|array|min:1',
-            // 'languages.*.language_id' => 'required|exists:languages,id',
-            // 'languages.*.is_original' => 'nullable|boolean',
+            // Languages (movie_languages)
+            'languages' => 'required|array|min:1',
+            'languages.*.language_id' => 'required|exists:languages,id',
+            'languages.*.is_original' => 'nullable|boolean',
 
-            // Cast & Crew (movie_cast)
-            // 'people' => 'nullable|array',
-            // 'people.*.person_id' => 'required|exists:people,id',
-            // 'people.*.credit_type' => 'required|in:ACTOR,DIRECTOR,PRODUCER,WRITER,MUSIC',
-            // 'people.*.character_name' => 'nullable|string|max:150',
-            // 'people.*.display_order' => 'nullable|integer|min:1',
+            //Cast & Crew (movie_cast)
+            'people' => 'nullable|array',
+            'people.*.person_id' => 'required|exists:people,id',
+            'people.*.credit_type' => 'required|in:ACTOR,DIRECTOR,PRODUCER,WRITER,MUSIC',
+            'people.*.character_name' => 'nullable|string|max:150',
+            'people.*.display_order' => 'nullable|integer|min:1',
+        ];
+    }
+    public function messages(): array
+    {
+        return [
+            'title.unique' => 'A movie with this title and release date already exists.',
         ];
     }
 }

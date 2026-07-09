@@ -61,7 +61,7 @@ class Movie extends Model
     public function people()
     {
         return $this->belongsToMany(
-            People::class,
+            Person::class,
             'movie_cast',
             'movie_id',
             'person_id'

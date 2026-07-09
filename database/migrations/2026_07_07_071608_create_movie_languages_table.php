@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('movie_langauges', function (Blueprint $table) {
-           
+        Schema::create('movie_languages', function (Blueprint $table) {
+
             $table->foreignId('movie_id')
                 ->constrained('movies')
                 ->cascadeOnDelete();
@@ -25,7 +25,6 @@ return new class extends Migration
                 'movie_id',
                 'language_id'
             ]);
-            
         });
     }
 
@@ -34,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('movie_langauges');
+        Schema::dropIfExists('movie_languages');
     }
 };

@@ -12,7 +12,7 @@ class StorePeopleRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,7 +23,12 @@ class StorePeopleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => 'required|string|max:150|unique:people,name',
+            'date_of_birth' => 'nullable|date|before:today',
+            'gender' => 'nullable|in:MALE,FEMALE,OTHER',
+            'nationality' => 'nullable|string|max:100',
+            'photo_url' => 'nullable|url|max:500',
+            'bio' => 'nullable|string',
         ];
     }
 }

@@ -29,7 +29,28 @@ class MovieResource extends JsonResource
             'trailer_url' => $this->trailer_url,
             'status' => $this->status,
             'imdb_rating' => $this->imdb_rating,
+
+            'genres' => $this->whenLoaded('genres', function () {
+                return $this->genres->map(function ($genre) {
+                    return [
+                        'id' => $genre->id,
+                        'name' => $genre->name,
+                    ];
+                });
+            }),
+
+            'languages' => $this->whenLoaded('languages', function () {
+                return $this->languages->map(function ($language) {
+                    return [
+                        'id' => $language->id,
+                        'name' => $language->name,
+                        'is_original' => (bool) $language->pivot->is_original,
+                    ];
+                });
+            }),
        ];
+
+       
             
     }
     }

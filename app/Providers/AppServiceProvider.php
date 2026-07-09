@@ -5,11 +5,14 @@ namespace App\Providers;
 use App\Repositories\Eloquent\CompanyRepository;
 use App\Repositories\Eloquent\AuthRepository;
 use App\Repositories\Eloquent\CinemaRepository;
-use App\Repositories\Eloquent\LangaugeRepository;
 use App\Repositories\Eloquent\MovieRepository;
 use App\Repositories\Eloquent\ScreenRepository;
 use App\Repositories\Eloquent\SeatCategoryRepository;
 use App\Repositories\Eloquent\SeatRepository;
+use App\Repositories\Eloquent\ShowPriceRepository;
+use App\Repositories\Eloquent\ShowRepository;
+use App\Repositories\Eloquent\ShowSeatRepository;
+use App\Repositories\Eloquent\ShowScheduleRepository;
 use App\Repositories\Eloquent\StaffRepository;
 use App\Repositories\Interfaces\AuthRepositoryInterface;
 use App\Repositories\Interfaces\CinemaRepositoryInterface;
@@ -18,7 +21,10 @@ use App\Repositories\Interfaces\MovieRepositoryInterface;
 use App\Repositories\Interfaces\ScreenRepositoryInterface;
 use App\Repositories\Interfaces\SeatCategoryRepositoryInterface;
 use App\Repositories\Interfaces\SeatRepositoryInterface;
-
+use App\Repositories\Interfaces\ShowPriceRepositoryInterface;
+use App\Repositories\Interfaces\ShowRepositoryInterface;
+use App\Repositories\Interfaces\ShowScheduleRepositoryInterface;
+use App\Repositories\Interfaces\ShowSeatRepositoryInterface;
 use App\Repositories\Interfaces\StaffRepositoryInterface;
 use Carbon\CarbonInterval;
 use Illuminate\Support\ServiceProvider;
@@ -65,7 +71,22 @@ class AppServiceProvider extends ServiceProvider
             MovieRepositoryInterface::class,
             MovieRepository::class
         );
-       
+        $this->app->bind(
+            ShowScheduleRepositoryInterface::class,
+            ShowScheduleRepository::class
+        );
+        $this->app->bind(
+            ShowRepositoryInterface::class,
+            ShowRepository::class
+        );
+        $this->app->bind(
+            ShowPriceRepositoryInterface::class,
+            ShowPriceRepository::class
+        );
+        $this->app->bind(
+            ShowSeatRepositoryInterface::class,
+            ShowSeatRepository::class
+        );
     }
 
 

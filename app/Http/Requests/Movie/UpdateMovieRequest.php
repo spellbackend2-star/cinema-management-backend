@@ -71,16 +71,16 @@ class UpdateMovieRequest extends FormRequest
             'genres.*' => 'exists:genres,id',
 
             // Languages (movie_languages)
-            // 'languages' => 'required|array|min:1',
-            // 'languages.*.language_id' => 'required|exists:languages,id',
-            // 'languages.*.is_original' => 'nullable|boolean',
+            'languages' => 'required|array|min:1',
+            'languages.*.language_id' => 'required|exists:languages,id',
+            'languages.*.is_original' => 'nullable|boolean',
 
             // Cast & Crew (movie_cast)
-            // 'people' => 'nullable|array',
-            // 'people.*.person_id' => 'required|exists:people,id',
-            // 'people.*.credit_type' => 'required|in:ACTOR,DIRECTOR,PRODUCER,WRITER,MUSIC',
-            // 'people.*.character_name' => 'nullable|string|max:150',
-            // 'people.*.display_order' => 'nullable|integer|min:1',
+            'people' => 'nullable|array',
+            'people.*.person_id' => 'required|exists:people,id',
+            'people.*.credit_type' => 'required|in:ACTOR,DIRECTOR,PRODUCER,WRITER,MUSIC',
+            'people.*.character_name' => 'nullable|string|max:150',
+            'people.*.display_order' => 'nullable|integer|min:1',
         ];
     }
 }

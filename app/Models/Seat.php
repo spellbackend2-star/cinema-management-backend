@@ -4,12 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Seat extends Model
 {
+    use HasFactory, SoftDeletes;
 
-use HasFactory, SoftDeletes;
     protected $fillable = [
         'screen_id',
         'category_id',
@@ -25,7 +26,7 @@ use HasFactory, SoftDeletes;
         'is_active',
     ];
 
-     protected $casts = [
+    protected $casts = [
         'pos_x' => 'integer',
         'pos_y' => 'integer',
         'rotation' => 'integer',
@@ -36,4 +37,20 @@ use HasFactory, SoftDeletes;
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
+
+    /**
+     * Seat belongs to a Screen.
+     */
+    public function screen(): BelongsTo
+    {
+        return $this->belongsTo(Screen::class);
+    }
+
+    /**
+     * Seat belongs to a Seat Category.
+     */
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(SeatCategory::class, 'category_id');
+    }
 }
