@@ -6,115 +6,52 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StoreShowScheduleRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Validation rules.
-     */
     public function rules(): array
     {
         return [
+            'movie_id' => ['required', 'integer', 'exists:movies,id'],
+            'screen_id' => ['required', 'integer', 'exists:screens,id'],
+            'language_id' => ['required', 'integer', 'exists:languages,id'],
 
-            'movie_id' => [
-                'required',
-                'exists:movies,id',
-            ],
+            'start_date' => ['required', 'date', 'after_or_equal:today'],
+            'end_date' => ['required', 'date', 'after_or_equal:start_date'],
+            'show_time' => ['required', 'date_format:H:i:s'],
 
-            'screen_id' => [
-                'required',
-                'exists:screens,id',
-            ],
+            'days_of_week' => ['required', 'array', 'min:1'],
+            'days_of_week.*' => ['integer', 'between:1,7'],
 
-            'start_date' => [
-                'required',
-                'date',
-            ],
+            'format' => ['required', 'string', 'in:2D,3D,IMAX,4DX'],
 
-            'end_date' => [
-                'required',
-                'date',
-                'after_or_equal:start_date',
-            ],
+            'booking_opens_offset_min' => ['required', 'integer', 'min:0'],
+            'booking_closes_offset_min' => ['required', 'integer', 'min:0'],
 
-            'show_time' => [
-                'required',
-                'date_format:H:i',
-            ],
+            'is_active' => ['sometimes', 'boolean'],
 
-            'days_of_week' => [
-                'nullable',
-                'array',
-            ],
-
-            'days_of_week.*' => [
-                'in:1,2,3,4,5,6,7',
-            ],
-
-            'language_id' => [
-                'required',
-                'exists:languages,id',
-            ],
-
-            'format' => [
-                'required',
-                'in:2D,3D,IMAX,4DX',
-            ],
-
-            'booking_opens_offset_min' => [
-                'nullable',
-                'integer',
-                'min:0',
-            ],
-
-            'booking_closes_offset_min' => [
-                'nullable',
-                'integer',
-                'min:0',
-            ],
-
-            'is_active' => [
-                'nullable',
-                'boolean',
-            ],
-
-            'created_by' => [
-                'nullable',
-                'exists:users,id',
-            ],
+            'prices' => ['required', 'array', 'min:1'],
+            'prices.*.category_id' => ['required', 'integer', 'exists:seat_categories,id', 'distinct'],
+            'prices.*.base_price' => ['required', 'numeric', 'min:0'],
+            'prices.*.tax_percent' => ['sometimes', 'numeric', 'min:0', 'max:100'],
         ];
     }
 
-
-    /**
-     * Custom messages.
-     */
     public function messages(): array
     {
         return [
-
-            'movie_id.exists' => 'Selected movie does not exist.',
-
-            'screen_id.exists' => 'Selected screen does not exist.',
-
-            'language_id.exists' => 'Selected language does not exist.',
-
-            'end_date.after_or_equal' => 
-                'End date must be greater than or equal to start date.',
-
-            'show_time.date_format' =>
-                'Show time must be in HH:MM format.',
-
-            'days_of_week.*.in' =>
-                'Days of week must contain values from 1 to 7.',
-
-            'format.in' =>
-                'Invalid show format selected.',
+            'prices.*.category_id.distinct' => 'Each seat category can only have one price entry per schedule.',
+            'end_date.after_or_equal' => 'End date must be on or after the start date.',
+            'days_of_week.*.between' => 'Days of week must use ISO values 1 (Monday) through 7 (Sunday).',
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'created_by' => $this->user()?->id,
+        ]);
     }
 }

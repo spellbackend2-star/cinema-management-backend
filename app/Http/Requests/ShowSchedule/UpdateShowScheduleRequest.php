@@ -14,80 +14,37 @@ class UpdateShowScheduleRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'movie_id' => ['sometimes', 'required', 'integer', 'exists:movies,id'],
+            'screen_id' => ['sometimes', 'required', 'integer', 'exists:screens,id'],
+            'language_id' => ['sometimes', 'required', 'integer', 'exists:languages,id'],
 
-            'movie_id' => [
-                'sometimes',
-                'required',
-                'exists:movies,id',
-            ],
+            'start_date' => ['sometimes', 'required', 'date'],
+            'end_date' => ['sometimes', 'required', 'date', 'after_or_equal:start_date'],
+            'show_time' => ['sometimes', 'required', 'date_format:H:i:s'],
 
-            'screen_id' => [
-                'sometimes',
-                'required',
-                'exists:screens,id',
-            ],
+            'days_of_week' => ['sometimes', 'required', 'array', 'min:1'],
+            'days_of_week.*' => ['integer', 'between:1,7'],
 
-            'start_date' => [
-                'sometimes',
-                'required',
-                'date',
-            ],
+            'format' => ['sometimes', 'required', 'string', 'in:2D,3D,IMAX,4DX'],
 
-            'end_date' => [
-                'sometimes',
-                'required',
-                'date',
-                'after_or_equal:start_date',
-            ],
+            'booking_opens_offset_min' => ['sometimes', 'required', 'integer', 'min:0'],
+            'booking_closes_offset_min' => ['sometimes', 'required', 'integer', 'min:0'],
 
-            'show_time' => [
-                'sometimes',
-                'required',
-                'date_format:H:i',
-            ],
+            'is_active' => ['sometimes', 'boolean'],
 
-            'days_of_week' => [
-                'sometimes',
-                'array',
-            ],
+            'prices' => ['sometimes', 'required', 'array', 'min:1'],
+            'prices.*.category_id' => ['required_with:prices', 'integer', 'exists:seat_categories,id', 'distinct'],
+            'prices.*.base_price' => ['required_with:prices', 'numeric', 'min:0'],
+            'prices.*.tax_percent' => ['sometimes', 'numeric', 'min:0', 'max:100'],
+        ];
+    }
 
-            'days_of_week.*' => [
-                'in:1,2,3,4,5,6,7',
-            ],
-
-            'language_id' => [
-                'sometimes',
-                'required',
-                'exists:languages,id',
-            ],
-
-            'format' => [
-                'sometimes',
-                'required',
-                'in:2D,3D,IMAX,4DX',
-            ],
-
-            'booking_opens_offset_min' => [
-                'nullable',
-                'integer',
-                'min:0',
-            ],
-
-            'booking_closes_offset_min' => [
-                'nullable',
-                'integer',
-                'min:0',
-            ],
-
-            'is_active' => [
-                'nullable',
-                'boolean',
-            ],
-
-            'created_by' => [
-                'nullable',
-                'exists:users,id',
-            ],
+    public function messages(): array
+    {
+        return [
+            'prices.*.category_id.distinct' => 'Each seat category can only have one price entry per schedule.',
+            'end_date.after_or_equal' => 'End date must be on or after the start date.',
+            'days_of_week.*.between' => 'Days of week must use ISO values 1 (Monday) through 7 (Sunday).',
         ];
     }
 }

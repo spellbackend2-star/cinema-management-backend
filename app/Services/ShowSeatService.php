@@ -11,9 +11,17 @@ use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 class ShowSeatService
 {
+    private const LOCK_MINUTES = 5;
+
     public function __construct(
         protected ShowSeatRepositoryInterface $showSeatRepository
     ) {}
+
+    /*
+    |--------------------------------------------------------------------------
+    | CRUD
+    |--------------------------------------------------------------------------
+    */
 
     public function index(array $filters = [])
     {
@@ -22,29 +30,19 @@ class ShowSeatService
         );
     }
 
-    public function store(array $data)
+    public function store(array $data): ShowSeat
     {
         return $this->showSeatRepository->create($data);
     }
 
-    public function show(int $id)
+    public function show(int $id): ShowSeat
     {
-        $seat = $this->showSeatRepository->findById($id);
-
-        if (!$seat) {
-            throw new ModelNotFoundException('Show seat not found.');
-        }
-
-        return $seat;
+        return $this->findSeatOrFail($id);
     }
 
-    public function update(int $id, array $data)
+    public function update(int $id, array $data): ShowSeat
     {
-        $seat = $this->showSeatRepository->findById($id);
-
-        if (!$seat) {
-            throw new ModelNotFoundException('Show seat not found.');
-        }
+        $seat = $this->findSeatOrFail($id);
 
         $this->showSeatRepository->update($seat, $data);
 
@@ -53,49 +51,32 @@ class ShowSeatService
 
     public function destroy(int $id): void
     {
-        $seat = $this->showSeatRepository->findById($id);
-
-        if (!$seat) {
-            throw new ModelNotFoundException('Show seat not found.');
-        }
+        $seat = $this->findSeatOrFail($id);
 
         $this->showSeatRepository->delete($seat);
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Seat Lock
+    |--------------------------------------------------------------------------
+    */
 
     public function lockSeat(int $showSeatId, int $userId): ShowSeat
     {
         return DB::transaction(function () use ($showSeatId, $userId) {
 
-            $seat = $this->showSeatRepository->findForUpdate($showSeatId);
-
-            if (!$seat) {
-                throw new ModelNotFoundException('Seat not found.');
-            }
+            $seat = $this->findSeatForUpdate($showSeatId);
 
             $this->releaseExpiredLock($seat);
 
-            if ($seat->status === ShowSeat::BOOKED) {
-                throw new ConflictHttpException('Seat already booked.');
-            }
-
-            if ($seat->status === ShowSeat::BLOCKED) {
-                throw new ConflictHttpException('Seat is blocked.');
-            }
-
-            if (
-                $seat->status === ShowSeat::LOCKED &&
-                $seat->locked_by !== $userId
-            ) {
-                throw new ConflictHttpException(
-                    'Seat is already locked by another customer.'
-                );
-            }
+            $this->ensureSeatCanBeLocked($seat, $userId);
 
             $this->showSeatRepository->update($seat, [
-                'status' => ShowSeat::LOCKED,
-                'locked_by' => $userId,
+                'status'       => ShowSeat::LOCKED,
+                'locked_by'    => $userId,
                 'locked_until' => now()->addMinutes(
-                    config('booking.lock_minutes', 5)
+                    config('booking.lock_minutes', self::LOCK_MINUTES)
                 ),
             ]);
 
@@ -104,64 +85,112 @@ class ShowSeatService
         }, 3);
     }
 
-    // public function unlockSeat(int $showSeatId): ShowSeat
-    // {
-    //     return DB::transaction(function () use ($showSeatId) {
+    public function unlockSeat(int $showSeatId): ShowSeat
+    {
+        return DB::transaction(function () use ($showSeatId) {
 
-    //         $seat = $this->showSeatRepository->findForUpdate($showSeatId);
+            $seat = $this->findSeatForUpdate($showSeatId);
 
-    //         if (!$seat) {
-    //             throw new ModelNotFoundException('Seat not found.');
-    //         }
+            $this->showSeatRepository->update($seat, [
+                'status'       => ShowSeat::AVAILABLE,
+                'locked_by'    => null,
+                'locked_until' => null,
+            ]);
 
-    //         $this->showSeatRepository->update($seat, [
-    //             'status' => ShowSeat::AVAILABLE,
-    //             'locked_by' => null,
-    //             'locked_until' => null,
-    //         ]);
-
-    //         return $seat->fresh();
-
-    //     });
-    // }
+            return $seat->fresh();
+        });
+    }
 
     public function bookSeat(int $showSeatId, int $userId): ShowSeat
     {
         return DB::transaction(function () use ($showSeatId, $userId) {
 
-            $seat = $this->showSeatRepository->findForUpdate($showSeatId);
+            $seat = $this->findSeatForUpdate($showSeatId);
 
-            if (!$seat) {
-                throw new ModelNotFoundException('Seat not found.');
-            }
-
-            if (
-                $seat->status !== ShowSeat::LOCKED ||
-                $seat->locked_by !== $userId
-            ) {
-                throw new ConflictHttpException(
-                    'Seat must be locked by you before booking.'
-                );
-            }
-
-            if (
-                $seat->locked_until &&
-                Carbon::parse($seat->locked_until)->isPast()
-            ) {
-                throw new ConflictHttpException(
-                    'Seat lock has expired.'
-                );
-            }
+            $this->ensureSeatCanBeBooked($seat, $userId);
 
             $this->showSeatRepository->update($seat, [
-                'status' => ShowSeat::BOOKED,
-                'locked_by' => null,
+                'status'       => ShowSeat::BOOKED,
+                'locked_by'    => null,
                 'locked_until' => null,
             ]);
 
             return $seat->fresh();
-
         });
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Validation Helpers
+    |--------------------------------------------------------------------------
+    */
+
+    private function findSeatOrFail(int $id): ShowSeat
+    {
+        $seat = $this->showSeatRepository->findById($id);
+
+        if (! $seat) {
+            throw new ModelNotFoundException('Show seat not found.');
+        }
+
+        return $seat;
+    }
+
+    private function findSeatForUpdate(int $id): ShowSeat
+    {
+        $seat = $this->showSeatRepository->findForUpdate($id);
+
+        if (! $seat) {
+            throw new ModelNotFoundException('Seat not found.');
+        }
+
+        return $seat;
+    }
+
+    private function ensureSeatCanBeLocked(
+        ShowSeat $seat,
+        int $userId
+    ): void {
+        if ($seat->status === ShowSeat::BOOKED) {
+            throw new ConflictHttpException('Seat already booked.');
+        }
+
+        if ($seat->status === ShowSeat::BLOCKED) {
+            throw new ConflictHttpException('Seat is blocked.');
+        }
+
+        if (
+            $seat->status === ShowSeat::LOCKED &&
+            $seat->locked_by !== $userId
+        ) {
+            throw new ConflictHttpException(
+                'Seat is already locked by another customer.'
+            );
+        }
+    }
+
+    private function ensureSeatCanBeBooked(
+        ShowSeat $seat,
+        int $userId
+    ): void {
+
+        if (
+            $seat->status !== ShowSeat::LOCKED ||
+            $seat->locked_by !== $userId
+        ) {
+            throw new ConflictHttpException(
+                'Seat must be locked by you before booking.'
+            );
+        }
+
+        if (
+            $seat->locked_until &&
+            Carbon::parse($seat->locked_until)->isPast()
+        ) {
+            throw new ConflictHttpException(
+                'Seat lock has expired.'
+            );
+        }
     }
 
     private function releaseExpiredLock(ShowSeat $seat): void
@@ -172,8 +201,8 @@ class ShowSeatService
             Carbon::parse($seat->locked_until)->isPast()
         ) {
             $this->showSeatRepository->update($seat, [
-                'status' => ShowSeat::AVAILABLE,
-                'locked_by' => null,
+                'status'       => ShowSeat::AVAILABLE,
+                'locked_by'    => null,
                 'locked_until' => null,
             ]);
 

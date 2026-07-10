@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Show\StoreShowRequest;
 use App\Http\Requests\Show\UpdateShowRequest;
 use App\Http\Resources\ShowResource;
+use App\Services\ShowSeatService;
 use App\Services\ShowService;
 use Illuminate\Http\Request;
 
@@ -13,7 +14,7 @@ class ShowController extends Controller
 {
 
     public function __construct(
-        protected ShowService $showService
+        protected ShowSeatService $showService
     ) {}
 
 

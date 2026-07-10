@@ -7,6 +7,7 @@ use App\Repositories\Eloquent\AuthRepository;
 use App\Repositories\Eloquent\BookingRepository;
 use App\Repositories\Eloquent\CinemaRepository;
 use App\Repositories\Eloquent\MovieRepository;
+use App\Repositories\Eloquent\PaymentRepository;
 use App\Repositories\Eloquent\ScreenRepository;
 use App\Repositories\Eloquent\SeatCategoryRepository;
 use App\Repositories\Eloquent\SeatRepository;
@@ -20,6 +21,7 @@ use App\Repositories\Interfaces\BookingRepositoryInterface;
 use App\Repositories\Interfaces\CinemaRepositoryInterface;
 use App\Repositories\Interfaces\CompanyRepositoryInterface;
 use App\Repositories\Interfaces\MovieRepositoryInterface;
+use App\Repositories\Interfaces\PaymentRepositoryInterface;
 use App\Repositories\Interfaces\ScreenRepositoryInterface;
 use App\Repositories\Interfaces\SeatCategoryRepositoryInterface;
 use App\Repositories\Interfaces\SeatRepositoryInterface;
@@ -92,6 +94,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(
             BookingRepositoryInterface::class,
             BookingRepository::class
+        );
+         $this->app->bind(
+            PaymentRepositoryInterface::class,
+            PaymentRepository::class
         );
     }
 

@@ -35,6 +35,12 @@ class ShowSeat extends Model
     {
         return $this->belongsTo(Show::class);
     }
+    public function bookingSeats()
+    {
+        return $this->hasMany(
+            BookingSeat::class
+        );
+    }
 
     /**
      * Seat

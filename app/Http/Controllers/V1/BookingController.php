@@ -7,9 +7,10 @@ use App\Http\Requests\Booking\StoreBookingRequest;
 use App\Http\Requests\Booking\IndexBookingRequest;
 use App\Http\Requests\Booking\UpdateBookingRequest;
 use App\Http\Resources\BookingResource;
-use App\Repositories\Eloquent\BookingRepository;
+use App\Http\Resources\PaymentResource;
 use App\Services\BookingService;
 use App\Traits\ResponseTrait;
+use Illuminate\Support\Facades\Auth;
 
 class BookingController extends Controller
 {
@@ -26,8 +27,8 @@ class BookingController extends Controller
     {
 
         return BookingResource::collection(
-          $this->bookingService
-                ->index($request->validated())
+            $this->bookingService
+                ->getall($request->validated())
         );
     }
 
@@ -83,29 +84,20 @@ class BookingController extends Controller
     {
 
 
-        try {
 
-            $result = $this->bookingService->store(
+        $result = $this->bookingService->store(
 
-                $request->validated(),
+            $request->validated(),
 
-                auth()->id()
+            Auth::id()
 
-            );
-        } catch (\Exception $e) {
-
-
-            return $this->errorResponse(
-                $e->getMessage(),
-                422
-            );
-        }
-
-
-
+        );
 
         return $this->successResponse(
-            $result,
+            [
+                'booking' => new BookingResource($result['booking']),
+                'payment' => new PaymentResource($result['payment']),
+            ],
             'Payment initiated successfully',
             201
         );

@@ -46,11 +46,18 @@ class ShowScheduleRepository implements ShowScheduleRepositoryInterface
 
     public function store(array $data)
     {
+        if (isset($data['days_of_week']) && is_array($data['days_of_week'])) {
+            $data['days_of_week'] = implode(',', $data['days_of_week']);
+        }
         return ShowSchedule::create($data);
     }
 
     public function update(int $id, array $data)
     {
+        if (isset($data['days_of_week']) && is_array($data['days_of_week'])) {
+            $data['days_of_week'] = implode(',', $data['days_of_week']);
+        }
+
         $schedule = ShowSchedule::findOrFail($id);
 
         $schedule->update($data);

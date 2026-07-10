@@ -11,6 +11,7 @@ use App\Http\Controllers\V1\SeatCategoryController;
 use App\Http\Controllers\V1\SeatController;
 use App\Http\Controllers\V1\StaffController;
 use App\Http\Controllers\V1\LanguageController;
+use App\Http\Controllers\V1\PaymentGatewayController;
 use App\Http\Controllers\V1\PeopleController;
 use App\Http\Controllers\V1\ShowController;
 use App\Http\Controllers\V1\ShowPriceController;
@@ -30,6 +31,18 @@ Route::prefix('v1')->group(function () {
 
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
+    Route::get('/payments/esewa/success', [PaymentGatewayController::class, 'success'])
+        ->name('payments.esewa.success');
+
+    Route::get('/payments/esewa/failure', [PaymentGatewayController::class, 'failure'])
+        ->name('payments.esewa.failure');
+
+
+
+    Route::get(
+        'payments/khalti/verify/{payment}',
+        [PaymentGatewayController::class, 'verifyKhalti']
+    )->name('payments.khalti.verify');
 
     Route::middleware(['auth:api', 'role:company_admin|BranchManager'])->group(function () {
 
@@ -56,7 +69,6 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('shows', ShowController::class);
         Route::apiResource('show-prices', ShowPriceController::class);
         Route::apiResource('show-seats', ShowSeatController::class);
-       
     });
 
     Route::middleware(['auth:api', 'role:customer'])
@@ -72,14 +84,14 @@ Route::prefix('v1')->group(function () {
             // Seats
 
             // Seat Prices
-            Route::get('/show-prices', [ShowPriceController::class, 'index']);
+            //  Route::get('/show-prices', [ShowPriceController::class, 'index']);
             Route::get('show-schedules', [ShowScheduleController::class, 'index']);
             // Shows / Schedules
-            Route::get('/shows', [ShowController::class, 'index']);
+            //  Route::get('/shows', [ShowController::class, 'index']);
 
             Route::get('show-seats', [ShowSeatController::class, 'index']);
             Route::post('/bookings', [BookingController::class, 'store']);
             // Booking
-            
+            Route::post('payments/verify',         [PaymentGatewayController::class, 'verify']);
         });
 });

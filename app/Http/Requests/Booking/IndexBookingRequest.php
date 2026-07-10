@@ -16,63 +16,35 @@ class IndexBookingRequest extends FormRequest
     {
         return [
 
-            'booking_reference' => [
-                'nullable',
-                'string',
-            ],
-
-
-            'user_id' => [
-                'nullable',
-                'integer',
-                'exists:users,id',
-            ],
-
-
             'show_id' => [
-                'nullable',
-                'integer',
-                'exists:shows,id',
+                'required',
+                'exists:shows,id'
             ],
 
 
-            'status' => [
-                'nullable',
-                'in:pending,confirmed,cancelled,expired',
+            'show_seat_ids' => [
+                'required',
+                'array',
+                'min:1'
             ],
 
 
-            'payment_status' => [
+            'show_seat_ids.*' => [
+                'required',
+                'exists:show_seats,id'
+            ],
+
+
+            'coupon_id' => [
                 'nullable',
-                'in:pending,paid,failed,refunded',
+                'exists:coupons,id'
             ],
 
 
             'booking_source' => [
                 'nullable',
-                'in:online,staff',
-            ],
-
-
-            'date_from' => [
-                'nullable',
-                'date',
-            ],
-
-
-            'date_to' => [
-                'nullable',
-                'date',
-                'after_or_equal:date_from',
-            ],
-
-
-            'per_page' => [
-                'nullable',
-                'integer',
-                'min:1',
-                'max:100',
-            ],
+                'in:WEB,APP,COUNTER,KIOSK'
+            ]
 
         ];
     }

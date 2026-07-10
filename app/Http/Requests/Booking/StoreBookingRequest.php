@@ -6,7 +6,6 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StoreBookingRequest extends FormRequest
 {
-
     public function authorize(): bool
     {
         return true;
@@ -17,20 +16,27 @@ class StoreBookingRequest extends FormRequest
     {
         return [
 
-            'user_id' => [
-                'required',
-                'exists:users,id'
-            ],
-
-            'booked_by_user_id' => [
-                'nullable',
-                'exists:users,id'
-            ],
-
             'show_id' => [
                 'required',
                 'exists:shows,id'
             ],
+
+
+            'show_seat_ids' => [
+                'required',
+                'array',
+                'min:1'
+            ],
+            'payment_method' => [
+                'required',
+                'in:CASH,KHALTI,ESEWA'
+            ],
+
+            'show_seat_ids.*' => [
+                'required',
+                'exists:show_seats,id'
+            ],
+
 
             'coupon_id' => [
                 'nullable',
@@ -38,79 +44,9 @@ class StoreBookingRequest extends FormRequest
             ],
 
 
-            'subtotal' => [
-                'required',
-                'numeric',
-                'min:0'
-            ],
-
-            'tax_amount' => [
-                'nullable',
-                'numeric',
-                'min:0'
-            ],
-
-            'discount_amount' => [
-                'nullable',
-                'numeric',
-                'min:0'
-            ],
-
-            'convenience_fee' => [
-                'nullable',
-                'numeric',
-                'min:0'
-            ],
-
-            'total_amount' => [
-                'required',
-                'numeric',
-                'min:0'
-            ],
-
-
-            'status' => [
-                'nullable',
-                'in:PENDING,CONFIRMED,CANCELLED,EXPIRED'
-            ],
-
-
-            'payment_status' => [
-                'nullable',
-                'in:UNPAID,PAID,PARTIALLY_REFUNDED,REFUNDED'
-            ],
-
-
             'booking_source' => [
                 'nullable',
                 'in:WEB,APP,COUNTER,KIOSK'
-            ],
-
-
-            'expires_at' => [
-                'nullable',
-                'date'
-            ],
-
-
-            /*
-             | Booking seats
-             */
-            'seats' => [
-                'required',
-                'array',
-                'min:1'
-            ],
-
-            'seats.*.show_seat_id' => [
-                'required',
-                'exists:show_seats,id'
-            ],
-
-            'seats.*.price' => [
-                'required',
-                'numeric',
-                'min:0'
             ]
 
         ];

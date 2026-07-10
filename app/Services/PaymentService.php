@@ -15,11 +15,19 @@ class PaymentService
     public function __construct(
         protected PaymentRepositoryInterface $paymentRepo,
         protected KhaltiService $khaltiService,
-        // protected EsewaService $esewaService,
+        protected EsewaService $esewaService,
     ) {}
 
 
+    public function getAll(array $filters = [])
+    {
+        return $this->paymentRepo->getAll($filters);
+    }
 
+    public function findById(int $id)
+    {
+        return $this->paymentRepo->findById($id);
+    }
     public function createFromBooking(
         Booking $booking,
         array $data
@@ -31,7 +39,6 @@ class PaymentService
 
         $payment = $this->paymentRepo->create([
 
-            'payment_references' => $reference,
 
             'user_id' => $booking->user_id,
 
@@ -41,23 +48,23 @@ class PaymentService
             'amount' => $data['amount'],
 
             'currency' =>
-                $data['currency'] ?? 'NPR',
+            $data['currency'] ?? 'NPR',
 
 
             'payment_method' =>
-                $data['payment_method'] ?? 'cash',
+            $data['payment_method'],
 
 
-            'payment_status' =>
-                'pending',
+            'status' =>
+            'PENDING',
 
 
             'transaction_id' =>
-                Str::uuid(),
+            $reference,
 
 
             'payment_date' =>
-                now(),
+            now(),
 
         ]);
 
@@ -66,25 +73,25 @@ class PaymentService
 
         // CASH PAYMENT
 
-        if($payment->payment_method === 'cash') {
+        if ($payment->payment_method === 'CASH') {
 
 
             $payment->update([
-                'payment_status'=>'completed',
+                'payment_status' => 'completed',
             ]);
 
 
-            $booking->update([
-                'status'=>'confirmed'
+            $payment->update([
+                'status' => 'SUCCESS',
+                'paid_at' => now(),
             ]);
 
 
 
             return [
-                'payment'=>$payment->fresh(),
-                'status'=>'completed'
+                'payment' => $payment->fresh(),
+                'status' => 'completed'
             ];
-
         }
 
 
@@ -93,28 +100,46 @@ class PaymentService
 
         // ONLINE PAYMENT
 
-        return match($payment->payment_method){
+        return match ($payment->payment_method) {
 
-            'khalti' =>
-                $this->handleKhalti($payment),
+            'KHALTI' =>
+            $this->handleKhalti($payment),
 
 
-            'esewa' =>
-                $this->esewaService->initiate($payment),
+            'ESEWA' =>
+            $this->esewaService->initiate($payment),
 
 
             default =>
-                throw new \Exception(
-                    'Unsupported payment method'
-                ),
-
+            throw new \Exception(
+                'Unsupported payment method'
+            ),
         };
-
-
     }
 
 
 
+    public function updateStatus(int $id, string $status)
+    {
+        $payment = $this->paymentRepo->findById($id);
+
+        if ($payment->payment_status === 'SUCCESS') {
+            return $payment;
+        }
+
+        $this->paymentRepo->update($id, [
+            'payment_status' => $status,
+            'payment_date' => now(),
+        ]);
+
+        if ($status === 'completed') {
+            $payment->Booking?->update([
+                'status' => 'confirmed',
+            ]);
+        }
+
+        return $payment->fresh();
+    }
 
 
     private function handleKhalti($payment)
@@ -122,32 +147,31 @@ class PaymentService
 
         $response =
             $this->khaltiService
-                ->initiate($payment);
+            ->initiate($payment);
 
 
 
         $payment->update([
 
             'transaction_id' =>
-                $response['pidx'] ?? null,
+            $response['pidx'] ?? null,
 
 
             'gateway_reference' =>
-                $response['pidx'] ?? null,
+            $response['pidx'] ?? null,
 
 
             'payment_url' =>
-                $response['payment_url'] ?? null,
+            $response['payment_url'] ?? null,
 
         ]);
 
 
 
         return [
-            'payment'=>$payment->fresh(),
-            'gateway'=>$response
+            'payment' => $payment->fresh(),
+            'gateway' => $response
         ];
-
     }
 
 
@@ -159,17 +183,13 @@ class PaymentService
         do {
 
             $ref =
-                'PAY-'.strtoupper(Str::random(8));
-
-
-        } while(
+                'PAY-' . strtoupper(Str::random(8));
+        } while (
             $this->paymentRepo
-                ->existsByReference($ref)
+            ->existsByReference($ref)
         );
 
 
         return $ref;
-
     }
-
 }

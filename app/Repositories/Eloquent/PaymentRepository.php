@@ -27,7 +27,6 @@ class PaymentRepository implements PaymentRepositoryInterface
                     'payment_references',
                     $filters['payment_references']
                 );
-
             }
         );
 
@@ -42,7 +41,6 @@ class PaymentRepository implements PaymentRepositoryInterface
                     'payment_method',
                     $filters['payment_method']
                 );
-
             }
         );
 
@@ -57,7 +55,6 @@ class PaymentRepository implements PaymentRepositoryInterface
                     'payment_status',
                     $filters['payment_status']
                 );
-
             }
         );
 
@@ -72,7 +69,6 @@ class PaymentRepository implements PaymentRepositoryInterface
                     'user_id',
                     $filters['user_id']
                 );
-
             }
         );
 
@@ -87,7 +83,6 @@ class PaymentRepository implements PaymentRepositoryInterface
                     'booking_id',
                     $filters['booking_id']
                 );
-
             }
         );
 
@@ -102,7 +97,6 @@ class PaymentRepository implements PaymentRepositoryInterface
                     'currency',
                     strtoupper($filters['currency'])
                 );
-
             }
         );
 
@@ -118,7 +112,6 @@ class PaymentRepository implements PaymentRepositoryInterface
                     '>=',
                     $filters['date_from']
                 );
-
             }
         );
 
@@ -133,7 +126,6 @@ class PaymentRepository implements PaymentRepositoryInterface
                     '<=',
                     $filters['date_to']
                 );
-
             }
         );
 
@@ -144,7 +136,6 @@ class PaymentRepository implements PaymentRepositoryInterface
             ->paginate(
                 $filters['per_page'] ?? 10
             );
-
     }
 
 
@@ -157,7 +148,7 @@ class PaymentRepository implements PaymentRepositoryInterface
             'user',
             'booking',
         ])
-        ->findOrFail($id);
+            ->findOrFail($id);
     }
 
 
@@ -185,7 +176,6 @@ class PaymentRepository implements PaymentRepositoryInterface
             'user',
             'booking',
         ]);
-
     }
 
 
@@ -195,10 +185,10 @@ class PaymentRepository implements PaymentRepositoryInterface
     public function findByReference(string $reference)
     {
         return Payment::where(
-            'payment_references',
-            $reference
+             'transaction_id',
+            $reference,
         )
-        ->firstOrFail();
+            ->firstOrFail();
     }
 
 
@@ -208,10 +198,10 @@ class PaymentRepository implements PaymentRepositoryInterface
     public function existsByReference(string $ref): bool
     {
         return Payment::where(
-            'payment_references',
-            $ref
+            'transaction_id',
+            $ref,
         )
-        ->exists();
+            ->exists();
     }
 
 
@@ -222,5 +212,4 @@ class PaymentRepository implements PaymentRepositoryInterface
     {
         return Payment::destroy($id);
     }
-
 }
