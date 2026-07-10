@@ -100,7 +100,7 @@ class RolePermissionSeeder extends Seeder
                 'booking.view', 'booking.create', 'booking.cancel',
                 'payment.process',
                 'ticket.view', 'ticket.download',
-                'profile.view', 'profile.update',
+                'profile.view', 'profile.update','show.view', 'show.create', 'show.update', 'show.delete',
             ],
         ];
 

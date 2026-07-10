@@ -21,8 +21,9 @@ class SeatCategory extends Model
         return $this->belongsTo(Screen::class);
     }
 
+    
     public function seats()
-    {
-        return $this->hasMany(Seat::class);
-    }
+{
+    return $this->hasMany(Seat::class, 'category_id');
+}
 }

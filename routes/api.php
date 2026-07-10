@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\V1\AuthController;
+use App\Http\Controllers\V1\BookingController;
 use App\Http\Controllers\V1\CinemaController;
 use App\Http\Controllers\V1\CompanyController;
 use App\Http\Controllers\V1\GenreController;
@@ -15,7 +16,6 @@ use App\Http\Controllers\V1\ShowController;
 use App\Http\Controllers\V1\ShowPriceController;
 use App\Http\Controllers\V1\ShowScheduleController;
 use App\Http\Controllers\V1\ShowSeatController;
-use App\Models\ShowSchedule;
 use Illuminate\Support\Facades\Route;
 
 
@@ -31,7 +31,7 @@ Route::prefix('v1')->group(function () {
     Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
     Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
-    Route::middleware(['auth:api', 'role:company_admin'])->group(function () {
+    Route::middleware(['auth:api', 'role:company_admin|BranchManager'])->group(function () {
 
         Route::get('/profile', [AuthController::class, 'profile']);
 
@@ -48,8 +48,6 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('cinemas', CinemaController::class);
         Route::apiResource('screens', ScreenController::class);
         Route::apiResource('staff', StaffController::class);
-        Route::apiResource('seat-categories', SeatCategoryController::class);
-        Route::apiResource('seats', SeatController::class);
         Route::apiResource('movies', MovieController::class);
         Route::apiResource('genres', GenreController::class);
         Route::apiResource('languages', LanguageController::class);
@@ -57,6 +55,31 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('show-schedules', ShowScheduleController::class);
         Route::apiResource('shows', ShowController::class);
         Route::apiResource('show-prices', ShowPriceController::class);
-         Route::apiResource('showseats', ShowSeatController::class);
+        Route::apiResource('show-seats', ShowSeatController::class);
+       
+    });
 
-    });});
+    Route::middleware(['auth:api', 'role:customer'])
+        ->group(function () {
+
+            // Movies
+            Route::get('/movies', [MovieController::class, 'index']);
+            // Screens
+            Route::get('/screens', [ScreenController::class, 'index']);
+
+            // Seat Categories
+
+            // Seats
+
+            // Seat Prices
+            Route::get('/show-prices', [ShowPriceController::class, 'index']);
+            Route::get('show-schedules', [ShowScheduleController::class, 'index']);
+            // Shows / Schedules
+            Route::get('/shows', [ShowController::class, 'index']);
+
+            Route::get('show-seats', [ShowSeatController::class, 'index']);
+            Route::post('/bookings', [BookingController::class, 'store']);
+            // Booking
+            
+        });
+});

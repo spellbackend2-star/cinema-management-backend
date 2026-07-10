@@ -15,14 +15,7 @@ class SeatResource extends JsonResource
         return [
             'id' => $this->id,
 
-            'screen_id' => $this->screen_id,
-
-            'screen' => $this->whenLoaded('screen', function () {
-                return [
-                    'id' => $this->screen->id,
-                    'name' => $this->screen->name,
-                ];
-            }),
+            
 
             'category_id' => $this->category_id,
 

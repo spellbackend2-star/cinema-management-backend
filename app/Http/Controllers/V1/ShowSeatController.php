@@ -5,65 +5,45 @@ namespace App\Http\Controllers\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ShowSeat\StoreShowSeatRequest;
 use App\Http\Requests\ShowSeat\UpdateShowSeatRequest;
+use App\Http\Requests\ShowSeat\LockSeatRequest;
+use App\Http\Requests\ShowSeat\BookSeatRequest;
+use App\Http\Requests\ShowSeat\UnlockSeatRequest;
 use App\Http\Resources\ShowSeatResource;
 use App\Services\ShowSeatService;
-use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ShowSeatController extends Controller
 {
-    use ResponseTrait;
+    public function __construct(
+        protected ShowSeatService $showSeatService
+    ) {}
 
-    protected ShowSeatService $showSeatService;
-
-    public function __construct(ShowSeatService $showSeatService)
-    {
-        $this->showSeatService = $showSeatService;
-    }
-
-    /**
-     * Display a listing.
-     */
     public function index(Request $request)
     {
-        $showSeats = $this->showSeatService->index($request->all());
-
-        return $this->successResponse(
-            ShowSeatResource::collection($showSeats),
-            'Show seats retrieved successfully.'
+        $showSeats = $this->showSeatService->index(
+            $request->only('per_page')
         );
+
+        return ShowSeatResource::collection($showSeats);
     }
 
-    /**
-     * Store a newly created resource.
-     */
     public function store(StoreShowSeatRequest $request)
     {
-        $showSeat = $this->showSeatService->store($request->validated());
-
-        return $this->successResponse(
-            new ShowSeatResource($showSeat),
-            'Show seat created successfully.',
-            201
+        $showSeat = $this->showSeatService->store(
+            $request->validated()
         );
+
+        return new ShowSeatResource($showSeat);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(int $id)
     {
-        $showSeat = $this->showSeatService->show($id);
-
-        return $this->successResponse(
-            new ShowSeatResource($showSeat),
-            'Show seat retrieved successfully.'
+        return new ShowSeatResource(
+            $this->showSeatService->show($id)
         );
     }
 
-    /**
-     * Update the specified resource.
-     */
     public function update(UpdateShowSeatRequest $request, int $id)
     {
         $showSeat = $this->showSeatService->update(
@@ -71,22 +51,51 @@ class ShowSeatController extends Controller
             $request->validated()
         );
 
-        return $this->successResponse(
-            new ShowSeatResource($showSeat),
-            'Show seat updated successfully.'
-        );
+        return new ShowSeatResource($showSeat);
     }
 
-    /**
-     * Remove the specified resource.
-     */
     public function destroy(int $id)
     {
         $this->showSeatService->destroy($id);
 
-        return $this->successResponse(
-            null,
-            'Show seat deleted successfully.'
+        return response()->json([
+            'message' => 'Show seat deleted successfully.'
+        ]);
+    }
+
+    public function lock(LockSeatRequest $request, int $id)
+    {
+        $seat = $this->showSeatService->lockSeat(
+            $id,
+            Auth::id()
         );
+
+        return response()->json([
+            'message' => 'Seat locked successfully.',
+            'data' => new ShowSeatResource($seat),
+        ]);
+    }
+
+    public function book(BookSeatRequest $request, int $id)
+    {
+        $seat = $this->showSeatService->bookSeat(
+            $id,
+            Auth::id()
+        );
+
+        return response()->json([
+            'message' => 'Seat booked successfully.',
+            'data' => new ShowSeatResource($seat),
+        ]);
+    }
+
+    public function unlock(UnlockSeatRequest $request, int $id)
+    {
+        $seat = $this->showSeatService->unlockSeat($id);
+
+        return response()->json([
+            'message' => 'Seat unlocked successfully.',
+            'data' => new ShowSeatResource($seat),
+        ]);
     }
 }

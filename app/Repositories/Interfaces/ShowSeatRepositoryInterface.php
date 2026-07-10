@@ -23,4 +23,6 @@ interface ShowSeatRepositoryInterface
     public function update(ShowSeat $showSeat, array $data): bool;
 
     public function delete(ShowSeat $showSeat): bool;
+     public function findForUpdate(int $id): ?ShowSeat;
+    
 }

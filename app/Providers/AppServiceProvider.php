@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Repositories\Eloquent\CompanyRepository;
 use App\Repositories\Eloquent\AuthRepository;
+use App\Repositories\Eloquent\BookingRepository;
 use App\Repositories\Eloquent\CinemaRepository;
 use App\Repositories\Eloquent\MovieRepository;
 use App\Repositories\Eloquent\ScreenRepository;
@@ -15,6 +16,7 @@ use App\Repositories\Eloquent\ShowSeatRepository;
 use App\Repositories\Eloquent\ShowScheduleRepository;
 use App\Repositories\Eloquent\StaffRepository;
 use App\Repositories\Interfaces\AuthRepositoryInterface;
+use App\Repositories\Interfaces\BookingRepositoryInterface;
 use App\Repositories\Interfaces\CinemaRepositoryInterface;
 use App\Repositories\Interfaces\CompanyRepositoryInterface;
 use App\Repositories\Interfaces\MovieRepositoryInterface;
@@ -86,6 +88,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(
             ShowSeatRepositoryInterface::class,
             ShowSeatRepository::class
+        );
+        $this->app->bind(
+            BookingRepositoryInterface::class,
+            BookingRepository::class
         );
     }
 

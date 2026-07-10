@@ -9,6 +9,11 @@ class ShowSeat extends Model
 {
     use HasFactory;
 
+    public const AVAILABLE = 'AVAILABLE';
+    public const LOCKED = 'LOCKED';
+    public const BOOKED = 'BOOKED';
+    public const BLOCKED = 'BLOCKED';
+
     protected $fillable = [
         'show_id',
         'seat_id',

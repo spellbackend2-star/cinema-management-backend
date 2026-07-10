@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -36,7 +37,7 @@ class User extends Authenticatable
         ];
     }
 
-   
+
     public function company()
     {
         return $this->belongsTo(Company::class);
@@ -45,5 +46,19 @@ class User extends Authenticatable
     public function cinema()
     {
         return $this->belongsTo(Cinema::class);
+    }
+    public function loyaltyAccount()
+    {
+        return $this->hasOne(
+            LoyaltyAccount::class
+        );
+    }
+
+
+    public function bookings()
+    {
+        return $this->hasMany(
+            Booking::class
+        );
     }
 }

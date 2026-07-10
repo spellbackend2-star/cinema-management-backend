@@ -16,17 +16,23 @@ class ShowSeatRepository implements ShowSeatRepositoryInterface
     public function getAll(int $perPage = 10): LengthAwarePaginator
     {
         return $this->model
-            ->with(['show', 'seat', 'lockedBy'])
+            ->with(['show', 'seat', 'locker'])
             ->paginate($perPage);
     }
 
     public function findById(int $id): ?ShowSeat
     {
         return $this->model
-            ->with(['show', 'seat', 'lockedBy'])
+            ->with(['show', 'seat', 'locker'])
             ->find($id);
     }
-    
+    public function findForUpdate(int $id): ?ShowSeat
+    {
+        return $this->model
+            ->where('id', $id)
+            ->lockForUpdate()
+            ->first();
+    }
 
     public function findByShowAndSeat(int $showId, int $seatId): ?ShowSeat
     {
@@ -39,7 +45,7 @@ class ShowSeatRepository implements ShowSeatRepositoryInterface
     public function getByShow(int $showId): Collection
     {
         return $this->model
-            ->with(['show', 'seat', 'lockedBy'])
+            ->with(['seat'])
             ->where('show_id', $showId)
             ->get();
     }

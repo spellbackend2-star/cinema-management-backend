@@ -6,18 +6,23 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Models\Show;
 use App\Models\ShowSchedule;
+use App\Repositories\Interfaces\ShowPriceRepositoryInterface;
+use App\Repositories\Interfaces\ShowRepositoryInterface;
 use App\Repositories\Interfaces\ShowScheduleRepositoryInterface;
+use App\Repositories\Interfaces\ShowSeatRepositoryInterface;
 use Exception;
 
 class ShowScheduleService
 {
-    protected ShowScheduleRepositoryInterface $repository;
+
 
     public function __construct(
-        ShowScheduleRepositoryInterface $repository
-    ) {
-        $this->repository = $repository;
-    }
+        protected ShowScheduleRepositoryInterface $repository,
+        protected ShowRepositoryInterface $showRepository,
+        protected ShowPriceRepositoryInterface $showPriceRepository,
+        protected ShowSeatRepositoryInterface $showSeatRepository,
+
+    ) {}
 
 
     public function index(array $filters = [])
@@ -176,7 +181,7 @@ class ShowScheduleService
 
 
                 Show::create([
-                    
+
                     'movie_id' => $schedule->movie_id,
                     'screen_id' => $schedule->screen_id,
                     'start_time' => $startTime,

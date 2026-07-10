@@ -32,4 +32,5 @@ class Screen extends Model
 {
     return $this->hasMany(SeatCategory::class);
 }
+
 }

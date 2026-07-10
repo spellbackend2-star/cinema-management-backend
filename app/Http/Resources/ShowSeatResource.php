@@ -24,8 +24,8 @@ class ShowSeatResource extends JsonResource
             'seat' => [
                 'id' => $this->seat?->id,
                 'seat_number' => $this->seat?->seat_number,
-                'row' => $this->seat?->row,
-                'type' => $this->seat?->type,
+                'row' => $this->seat?->row_label,
+                'type' => $this->seat?->seat_type,
             ],
 
             'status' => $this->status,
