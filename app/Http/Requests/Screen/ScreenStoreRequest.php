@@ -76,7 +76,7 @@ class ScreenStoreRequest extends FormRequest
             'seat_categories.*.seats.*.seat_label'  => 'nullable|string|max:20',
             'seat_categories.*.seats.*.pos_x'       => 'nullable|integer|min:0',
             'seat_categories.*.seats.*.pos_y'       => 'nullable|integer|min:0',
-            'seat_categories.*.image_icon' => 'nullable|string',
+            'seat_categories.*.image_icon' => 'nullable|image|mimes:jpg,jpeg,png,svg|max:2048',
             'seat_categories.*.display_order' => 'nullable|integer',
             'seat_categories.*.seats' => [
                 'required',

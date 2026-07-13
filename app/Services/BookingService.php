@@ -7,6 +7,7 @@ use App\Models\BookingSeat;
 use App\Models\ShowSeat;
 use App\Repositories\Interfaces\BookingRepositoryInterface;
 use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 
 class BookingService
 {
@@ -127,7 +128,7 @@ class BookingService
 
 
                 'expires_at' =>
-                now()->addMinutes(10)
+                now()->addMinutes(1)
 
             ]);
 
@@ -142,7 +143,13 @@ class BookingService
 
 
             foreach ($showSeats as $seat) {
+                $exists = BookingSeat::where('show_seat_id', $seat->id)
+                    ->where('is_active', true)
+                    ->exists();
 
+                if ($exists) {
+                    throw new ConflictHttpException('Seat already booked.');
+                }
                 BookingSeat::create([
 
                     'booking_id' => $booking->id,

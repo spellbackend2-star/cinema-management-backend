@@ -8,12 +8,13 @@ use App\Http\Requests\Movie\StoreMovieRequest;
 use App\Http\Requests\Movie\UpdateMovieRequest;
 use App\Http\Resources\MovieResource;
 use App\Services\MovieService;
+use App\Traits\AuthorizesWithPermission;
 use App\Traits\ResponseTrait;
 
 class MovieController extends Controller
 {
     use ResponseTrait;
-
+    use AuthorizesWithPermission;
 
     public function __construct(
         protected MovieService $service
@@ -23,6 +24,7 @@ class MovieController extends Controller
 
     public function index(IndexMovieRequest $request)
     {
+        $this->authorizePermission('movie.view');
         $movies = $this->service->index(
             $request->validated()
         );
@@ -34,10 +36,9 @@ class MovieController extends Controller
         );
     }
 
-
-
     public function store(StoreMovieRequest $request)
     {
+        $this->authorizePermission('movie.create');
         $movie = $this->service->store(
             $request->validated()
         );
@@ -50,10 +51,9 @@ class MovieController extends Controller
         );
     }
 
-
-
     public function show(int $id)
     {
+        $this->authorizePermission('movie.view');
         $movie = $this->service->show($id);
 
 
@@ -63,10 +63,9 @@ class MovieController extends Controller
         );
     }
 
-
-
     public function update(UpdateMovieRequest $request, int $id)
     {
+        $this->authorizePermission('movie.update');
         $movie = $this->service->update(
             $id,
             $request->validated()
@@ -79,10 +78,10 @@ class MovieController extends Controller
         );
     }
 
-
-
     public function destroy(int $id)
     {
+
+        $this->authorizePermission('movie.delete');
         $this->service->destroy($id);
 
 

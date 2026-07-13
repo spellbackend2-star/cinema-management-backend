@@ -6,11 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Payment\PaymentIndexRequest;
 use App\Http\Resources\PaymentResource;
 use App\Services\PaymentService;
+use App\Traits\AuthorizesWithPermission;
 use App\Traits\ResponseTrait;
 
 class PaymentController extends Controller
 {
-    use ResponseTrait;
+    use ResponseTrait, AuthorizesWithPermission;
 
     public function __construct(
         protected PaymentService $paymentService,
@@ -18,18 +19,20 @@ class PaymentController extends Controller
 
     public function index(PaymentIndexRequest $request)
     {
+        $this->authorizePermission('payment.view');
         $payments = $this->paymentService->getAll($request->validated());
 
         return $this->successResponse(
-            
-         PaymentResource::collection($payments),
-         
+
+            PaymentResource::collection($payments),
+
             'Payments retrieved successfully'
         );
     }
 
     public function show(int $id)
     {
+        $this->authorizePermission('payment.view');
         $payment = $this->paymentService->findbyid($id);
 
         if (!$payment) {

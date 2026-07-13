@@ -4,15 +4,17 @@ use App\Http\Controllers\V1\AuthController;
 use App\Http\Controllers\V1\BookingController;
 use App\Http\Controllers\V1\CinemaController;
 use App\Http\Controllers\V1\CompanyController;
+use App\Http\Controllers\V1\CouponController;
 use App\Http\Controllers\V1\GenreController;
 use App\Http\Controllers\V1\MovieController;
 use App\Http\Controllers\V1\ScreenController;
-use App\Http\Controllers\V1\SeatCategoryController;
-use App\Http\Controllers\V1\SeatController;
 use App\Http\Controllers\V1\StaffController;
 use App\Http\Controllers\V1\LanguageController;
+use App\Http\Controllers\V1\LoyaltyController;
+use App\Http\Controllers\V1\LoyaltyTransactionController;
 use App\Http\Controllers\V1\PaymentGatewayController;
 use App\Http\Controllers\V1\PeopleController;
+use App\Http\Controllers\V1\RolePermissionController;
 use App\Http\Controllers\V1\ShowController;
 use App\Http\Controllers\V1\ShowPriceController;
 use App\Http\Controllers\V1\ShowScheduleController;
@@ -38,24 +40,24 @@ Route::prefix('v1')->group(function () {
         ->name('payments.esewa.failure');
 
 
-
     Route::get(
         'payments/khalti/verify/{payment}',
         [PaymentGatewayController::class, 'verifyKhalti']
     )->name('payments.khalti.verify');
 
-    Route::middleware(['auth:api', 'role:company_admin|BranchManager'])->group(function () {
+    Route::middleware(['auth:api', 'role:company_admin|branch_Manager'])->group(function () {
 
         Route::get('/profile', [AuthController::class, 'profile']);
 
         Route::post('/logout', [AuthController::class, 'logout']);
 
-        /*
-    |--------------------------------------------------------------------------
-    | Staff Routes (staff guard)
-    |--------------------------------------------------------------------------
-    */
+        Route::controller(RolePermissionController::class)->prefix('role-permissions')->group(function () {
 
+            Route::post('/assign', 'assign');
+            Route::get('/role/{id}', 'show');
+            Route::get('/roles', 'indexRoles');
+            Route::get('/permissions', 'indexPermissions');
+        });
 
         Route::apiResource('companies', CompanyController::class);
         Route::apiResource('cinemas', CinemaController::class);
@@ -69,6 +71,7 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('shows', ShowController::class);
         Route::apiResource('show-prices', ShowPriceController::class);
         Route::apiResource('show-seats', ShowSeatController::class);
+        Route::apiResource('coupons', CouponController::class);
     });
 
     Route::middleware(['auth:api', 'role:customer'])
@@ -78,17 +81,22 @@ Route::prefix('v1')->group(function () {
             Route::get('/movies', [MovieController::class, 'index']);
             // Screens
             Route::get('/screens', [ScreenController::class, 'index']);
+            Route::get('coupons', [CouponController::class, 'index']);
 
-            // Seat Categories
+            Route::prefix('loyalty')->group(function () {
+                Route::get('/account', [LoyaltyController::class, 'account']);
+                Route::get('/history', [LoyaltyController::class, 'history']);
+                Route::post('/redeem', [LoyaltyController::class, 'redeem']);
+            });
 
-            // Seats
+            Route::prefix('loyalty-transactions')->group(function () {
 
+                Route::get('/', [LoyaltyTransactionController::class, 'index']);
+                Route::get('/{id}', [LoyaltyTransactionController::class, 'show']);
+            });
             // Seat Prices
-            //  Route::get('/show-prices', [ShowPriceController::class, 'index']);
             Route::get('show-schedules', [ShowScheduleController::class, 'index']);
             // Shows / Schedules
-            //  Route::get('/shows', [ShowController::class, 'index']);
-
             Route::get('show-seats', [ShowSeatController::class, 'index']);
             Route::post('/bookings', [BookingController::class, 'store']);
             // Booking

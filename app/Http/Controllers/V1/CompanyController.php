@@ -8,18 +8,20 @@ use App\Http\Requests\Company\CompanyStoreRequest;
 use App\Http\Requests\Company\CompanyUpdateRequest;
 use App\Http\Resources\CompanyResource;
 use App\Services\CompanyService;
+use App\Traits\AuthorizesWithPermission;
 use App\Traits\ResponseTrait;
 
 class CompanyController extends Controller
 {
     use ResponseTrait;
-
+    use AuthorizesWithPermission;
     public function __construct(
         protected CompanyService $service
     ) {}
 
     public function index(CompanyIndexRequest $request)
     {
+        $this->authorizePermission('company.view');
         return CompanyResource::collection(
             $this->service->index($request->validated())
         );
@@ -27,7 +29,7 @@ class CompanyController extends Controller
 
     public function store(CompanyStoreRequest $request)
     {
-
+        $this->authorizePermission('company.create');
         $company = $this->service->store($request->validated());
 
         return $this->successResponse(
@@ -39,6 +41,7 @@ class CompanyController extends Controller
 
     public function show(int $id)
     {
+         $this->authorizePermission('company.show');
         return $this->successResponse(
             new CompanyResource(
                 $this->service->show($id)
@@ -48,6 +51,7 @@ class CompanyController extends Controller
 
     public function update(CompanyUpdateRequest $request, int $id)
     {
+         $this->authorizePermission('company.update');
         $company = $this->service->update(
             $id,
             $request->validated()
@@ -61,6 +65,7 @@ class CompanyController extends Controller
 
     public function destroy(int $id)
     {
+         $this->authorizePermission('company.delete');
         $this->service->destroy($id);
 
         return $this->successResponse(

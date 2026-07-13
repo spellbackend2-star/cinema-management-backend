@@ -2,12 +2,17 @@
 
 namespace App\Providers;
 
+
 use App\Repositories\Eloquent\CompanyRepository;
 use App\Repositories\Eloquent\AuthRepository;
 use App\Repositories\Eloquent\BookingRepository;
 use App\Repositories\Eloquent\CinemaRepository;
+use App\Repositories\Eloquent\CouponRepository;
+use App\Repositories\Eloquent\LoyaltyAccountRepository;
+use App\Repositories\Eloquent\LoyaltyTransactionRepository;
 use App\Repositories\Eloquent\MovieRepository;
 use App\Repositories\Eloquent\PaymentRepository;
+use App\Repositories\Eloquent\RolePermissionRepository;
 use App\Repositories\Eloquent\ScreenRepository;
 use App\Repositories\Eloquent\SeatCategoryRepository;
 use App\Repositories\Eloquent\SeatRepository;
@@ -15,13 +20,18 @@ use App\Repositories\Eloquent\ShowPriceRepository;
 use App\Repositories\Eloquent\ShowRepository;
 use App\Repositories\Eloquent\ShowSeatRepository;
 use App\Repositories\Eloquent\ShowScheduleRepository;
+
 use App\Repositories\Eloquent\StaffRepository;
 use App\Repositories\Interfaces\AuthRepositoryInterface;
 use App\Repositories\Interfaces\BookingRepositoryInterface;
 use App\Repositories\Interfaces\CinemaRepositoryInterface;
 use App\Repositories\Interfaces\CompanyRepositoryInterface;
+use App\Repositories\Interfaces\CouponRepositoryInterface;
+use App\Repositories\Interfaces\LoyaltyAccountRepositoryInterface;
+use App\Repositories\Interfaces\LoyaltyTransactionRepositoryInterface;
 use App\Repositories\Interfaces\MovieRepositoryInterface;
 use App\Repositories\Interfaces\PaymentRepositoryInterface;
+use App\Repositories\Interfaces\RolePermissionRepositoryInterface;
 use App\Repositories\Interfaces\ScreenRepositoryInterface;
 use App\Repositories\Interfaces\SeatCategoryRepositoryInterface;
 use App\Repositories\Interfaces\SeatRepositoryInterface;
@@ -95,9 +105,25 @@ class AppServiceProvider extends ServiceProvider
             BookingRepositoryInterface::class,
             BookingRepository::class
         );
-         $this->app->bind(
+        $this->app->bind(
             PaymentRepositoryInterface::class,
             PaymentRepository::class
+        );
+        $this->app->bind(
+            CouponRepositoryInterface::class,
+            CouponRepository::class
+        );
+        $this->app->bind(
+            LoyaltyAccountRepositoryInterface::class,
+            LoyaltyAccountRepository::class
+        );
+        $this->app->bind(
+            LoyaltyTransactionRepositoryInterface::class,
+            LoyaltyTransactionRepository::class
+        );
+        $this->app->bind(
+            RolePermissionRepositoryInterface::class,
+            RolePermissionRepository::class
         );
     }
 

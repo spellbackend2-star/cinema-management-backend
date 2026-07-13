@@ -60,6 +60,10 @@ class ScreenService
 
             // 2. Create Seat Categories
             foreach ($data['seat_categories'] as $category) {
+                if (isset($category['image_icon'])) {
+                    $category['image_icon'] = $category['image_icon']
+                        ->store('seat-categories', 'public');
+                }
 
                 $seatCategory = $this->seatCategoryRepository->create([
                     'screen_id' => $screen->id,
@@ -110,7 +114,7 @@ class ScreenService
             // Reload updated screen
             $screen = $this->repository->find($screen->id);
 
-           
+
 
             foreach ($screen->seatCategories as $category) {
 
@@ -121,9 +125,14 @@ class ScreenService
                 $category->delete();
             }
 
-           
+
 
             foreach ($data['seat_categories'] as $categoryData) {
+
+                if (isset($categoryData['image_icon'])) {
+                    $categoryData['image_icon'] = $categoryData['image_icon']
+                        ->store('seat-categories', 'public');
+                }
 
                 $seatCategory = $this->seatCategoryRepository->create([
                     'screen_id'     => $screen->id,

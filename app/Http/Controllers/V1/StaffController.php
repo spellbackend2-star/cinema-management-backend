@@ -9,12 +9,13 @@ use App\Http\Requests\Staff\StaffUpdateRequest;
 use App\Http\Resources\StaffResource;
 use App\Models\User;
 use App\Services\StaffService;
+use App\Traits\AuthorizesWithPermission;
 use App\Traits\ResponseTrait;
 
 class StaffController extends Controller
 {
     use ResponseTrait;
-
+    use AuthorizesWithPermission;
     protected StaffService $staffService;
 
     public function __construct(StaffService $staffService)
@@ -24,6 +25,7 @@ class StaffController extends Controller
 
     public function index(StaffIndexRequest $request)
     {
+        $this->authorizePermission('staff.view');
         $filters = $request->validated();
         $user = $request->user();
 
@@ -51,6 +53,7 @@ class StaffController extends Controller
 
     public function store(StaffStoreRequest $request)
     {
+        $this->authorizePermission('staff.create');
         $staff = $this->staffService->store($request->validated(), $request->user());
 
         return $this->successResponse(
@@ -61,7 +64,7 @@ class StaffController extends Controller
 
     public function show(User $staff)
     {
-
+        $this->authorizePermission('staff.view');
         $staff = $this->staffService->show($staff->id);
 
         return $this->successResponse(
@@ -72,6 +75,7 @@ class StaffController extends Controller
 
     public function update(StaffUpdateRequest $request, User $staff)
     {
+        $this->authorizePermission('staff.update');
         $updated = $this->staffService->update($staff->id, $request->validated());
 
         return $this->successResponse(
@@ -82,7 +86,7 @@ class StaffController extends Controller
 
     public function destroy(User $staff)
     {
-
+        $this->authorizePermission('staff.delete');
         $this->staffService->destroy($staff->id);
 
         return $this->successResponse(null, 'Staff deleted successfully');

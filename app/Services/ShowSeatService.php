@@ -66,6 +66,7 @@ class ShowSeatService
     {
         return DB::transaction(function () use ($showSeatId, $userId) {
 
+        
             $seat = $this->findSeatForUpdate($showSeatId);
 
             $this->releaseExpiredLock($seat);

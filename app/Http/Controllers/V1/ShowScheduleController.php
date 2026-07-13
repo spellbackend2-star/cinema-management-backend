@@ -7,13 +7,14 @@ use App\Http\Requests\ShowSchedule\StoreShowScheduleRequest;
 use App\Http\Requests\ShowSchedule\UpdateShowScheduleRequest;
 use App\Http\Resources\ShowScheduleResource;
 use App\Services\ShowScheduleService;
+use App\Traits\AuthorizesWithPermission;
 use App\Traits\ResponseTrait;
 use Illuminate\Http\Request;
 
 class ShowScheduleController extends Controller
 {
     use ResponseTrait;
-
+    use AuthorizesWithPermission;
     protected ShowScheduleService $showScheduleService;
 
     public function __construct(ShowScheduleService $showScheduleService)
@@ -26,6 +27,7 @@ class ShowScheduleController extends Controller
      */
     public function index(Request $request)
     {
+         $this->authorizePermission('showschedule.view');
         $showSchedules = $this->showScheduleService->index($request->all());
 
         return $this->successResponse(
@@ -39,6 +41,7 @@ class ShowScheduleController extends Controller
      */
     public function store(StoreShowScheduleRequest $request)
     {
+         $this->authorizePermission('showschedule.create');
         $showSchedule = $this->showScheduleService->store($request->validated());
 
         return $this->successResponse(
@@ -53,6 +56,7 @@ class ShowScheduleController extends Controller
      */
     public function show(int $id)
     {
+         $this->authorizePermission('showschedule.view');
         $showSchedule = $this->showScheduleService->show($id);
 
         return $this->successResponse(
@@ -66,6 +70,7 @@ class ShowScheduleController extends Controller
      */
     public function update(UpdateShowScheduleRequest $request, int $id)
     {
+         $this->authorizePermission('showschedule.update');
         $showSchedule = $this->showScheduleService->update(
             $id,
             $request->validated()
@@ -82,6 +87,7 @@ class ShowScheduleController extends Controller
      */
     public function destroy(int $id)
     {
+         $this->authorizePermission('showschedule.delete');
         $this->showScheduleService->destroy($id);
 
         return $this->successResponse(

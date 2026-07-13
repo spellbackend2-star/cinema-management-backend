@@ -26,9 +26,11 @@ class RolePermissionSeeder extends Seeder
             'language.view', 'language.create', 'language.update', 'language.delete',
             'cast.view', 'cast.create', 'cast.update', 'cast.delete',
             'director.view', 'director.create', 'director.update', 'director.delete',
-            'show.view', 'show.create', 'show.update', 'show.delete',
+            'show-seat.view', 'show-seat.create', 'show-seat.update', 'show-seat.delete',
             'booking.view', 'booking.create', 'booking.cancel', 'booking.checkout',
             'ticket.view', 'ticket.print', 'ticket.download',
+            'loyalty.view','loyalty.create','loyalty.update',
+            'loyaltyTransaction.view','loyaltyTransaction.create','loyaltyTransaction.update',
             'payment.view', 'payment.process', 'payment.refund',
             'food.view', 'food.create', 'food.update', 'food.delete',
             'food_order.view',
@@ -100,7 +102,7 @@ class RolePermissionSeeder extends Seeder
                 'booking.view', 'booking.create', 'booking.cancel',
                 'payment.process',
                 'ticket.view', 'ticket.download',
-                'profile.view', 'profile.update','show.view', 'show.create', 'show.update', 'show.delete',
+                'profile.view', 'profile.update','show.view',
             ],
         ];
 
