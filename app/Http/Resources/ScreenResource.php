@@ -16,10 +16,10 @@ class ScreenResource extends JsonResource
     {
         return [
             'id' => $this->id,
-             'cinema' => [
-            'id' => $this->cinema->id,
-            'name' => $this->cinema->name,
-        ],
+            'cinema' => [
+                'id' => $this->cinema->id,
+                'name' => $this->cinema->name,
+            ],
             'name' => $this->name,
             'screen_type' => $this->screen_type,
             'capacity' => $this->capacity,
@@ -28,10 +28,10 @@ class ScreenResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
 
-             'seat_categories' => SeatCategoryResource::collection(
-            $this->whenLoaded('seatCategories')
-        ),
+            'seat_categories' => SeatCategoryResource::collection(
+                $this->whenLoaded('seatCategories')
+            ),
+
         ];
-        
     }
 }

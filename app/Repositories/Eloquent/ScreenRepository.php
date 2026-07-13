@@ -10,7 +10,10 @@ class ScreenRepository extends BaseRepository implements ScreenRepositoryInterfa
 {
     public function index(array $filters = [])
     {
-        $query = Screen::query()->latest();
+        $query = Screen::with([
+            'cinema',
+            'seatCategories.seats',
+        ])->latest();
 
         // Search
         $query = $this->applyFilter(
@@ -19,7 +22,7 @@ class ScreenRepository extends BaseRepository implements ScreenRepositoryInterfa
             [
                 'name',
                 'screen_type',
-               
+
             ]
         );
         $query = $this->applyExactFilters(

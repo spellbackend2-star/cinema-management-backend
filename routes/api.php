@@ -45,7 +45,7 @@ Route::prefix('v1')->group(function () {
         [PaymentGatewayController::class, 'verifyKhalti']
     )->name('payments.khalti.verify');
 
-    Route::middleware(['auth:api', 'role:company_admin|branch_Manager'])->group(function () {
+    Route::middleware(['auth:api', 'role:company_admin|branch_manager'])->group(function () {
 
         Route::get('/profile', [AuthController::class, 'profile']);
 
@@ -68,8 +68,6 @@ Route::prefix('v1')->group(function () {
         Route::apiResource('languages', LanguageController::class);
         Route::apiResource('people', PeopleController::class);
         Route::apiResource('show-schedules', ShowScheduleController::class);
-        Route::apiResource('shows', ShowController::class);
-        Route::apiResource('show-prices', ShowPriceController::class);
         Route::apiResource('show-seats', ShowSeatController::class);
         Route::apiResource('coupons', CouponController::class);
     });
@@ -80,7 +78,7 @@ Route::prefix('v1')->group(function () {
             // Movies
             Route::get('/movies', [MovieController::class, 'index']);
             // Screens
-            Route::get('/screens', [ScreenController::class, 'index']);
+            Route::get('/public/screens', [ScreenController::class, 'index']);
             Route::get('coupons', [CouponController::class, 'index']);
 
             Route::prefix('loyalty')->group(function () {

@@ -25,7 +25,9 @@ class ScreenController extends Controller
      */
     public function index(ScreenIndexRequest $request)
     {
+  
         $this->authorizePermission('screen.view');
+
         return ScreenResource::collection(
             $this->service->index($request->validated(), $request->user())
         );
@@ -36,15 +38,15 @@ class ScreenController extends Controller
         $this->authorizePermission('screen.create');
         $screen = $this->service->create($request->validated(), $request->user());
         return $this->successResponse(
-                new ScreenResource($screen),
-                'Screen created successfully.',
-                201
-            );
+            new ScreenResource($screen),
+            'Screen created successfully.',
+            201
+        );
     }
 
     public function show(Request $request, int $id)
     {
-         $this->authorizePermission('screen.view');
+        $this->authorizePermission('screen.view');
         return new ScreenResource(
             $this->service->find($id, $request->user())
         );
@@ -52,14 +54,14 @@ class ScreenController extends Controller
 
     public function update(ScreenUpdateRequest $request, string $id)
     {
-         $this->authorizePermission('screen.update');
+        $this->authorizePermission('screen.update');
         $screen = $this->service->update($id, $request->validated(), $request->user());
         return $this->successResponse(new ScreenResource($screen), 'Screen updated successfully.');
     }
 
     public function destroy(string $id, Request $request)
     {
-         $this->authorizePermission('screen.delete');
+        $this->authorizePermission('screen.delete');
         $this->service->delete($id, $request->user());
         return $this->successResponse(null, 'Screen deleted successfully.');
     }

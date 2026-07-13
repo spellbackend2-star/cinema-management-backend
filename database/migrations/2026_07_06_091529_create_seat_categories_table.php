@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('screen_id');
             $table->string('name', 50);
-            $table->string('image_icon', 50)->nullable();
+            $table->string('image_icon', 255)->nullable();
             $table->tinyInteger('display_order')->unsigned()->default(0);
            
             $table->timestamps(); 
