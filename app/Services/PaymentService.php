@@ -6,6 +6,7 @@ use App\Models\Booking;
 use App\Repositories\Interfaces\PaymentRepositoryInterface;
 use App\Services\Payments\KhaltiService;
 use App\Services\Payments\EsewaService;
+use App\Services\ShowSeatService;
 use Illuminate\Support\Str;
 
 
@@ -16,6 +17,8 @@ class PaymentService
         protected PaymentRepositoryInterface $paymentRepo,
         protected KhaltiService $khaltiService,
         protected EsewaService $esewaService,
+        protected ShowSeatService $showSeatService,
+
     ) {}
 
 
@@ -75,25 +78,28 @@ class PaymentService
 
         if ($payment->payment_method === 'CASH') {
 
-
             $payment->update([
-                'payment_status' => 'completed',
-            ]);
-
-
-            $payment->update([
-                'status' => 'SUCCESS',
+                'status'  => 'SUCCESS',
                 'paid_at' => now(),
             ]);
 
+            $booking = $payment->booking()->with('bookingSeats')->first();
 
+            $booking->update([
+                'status' => 'CONFIRMED',
+                'payment_status' => 'PAID',
+            ]);
+
+            foreach ($booking->bookingSeats as $bookingSeat) {
+                $this->showSeatService
+                    ->bookDirectly($bookingSeat->show_seat_id);
+            }
 
             return [
                 'payment' => $payment->fresh(),
-                'status' => 'completed'
+                'status' => 'completed',
             ];
         }
-
 
 
 
@@ -133,9 +139,17 @@ class PaymentService
         ]);
 
         if ($status === 'completed') {
-            $payment->Booking?->update([
-                'status' => 'confirmed',
+
+            $booking = $payment->booking()->with('bookingSeats')->first();
+
+            $booking->update([
+                'status' => 'CONFIRMED',
+                'payment_status' => 'PAID',
             ]);
+
+            foreach ($booking->bookingSeats as $bookingSeat) {
+                $this->showSeatService->bookDirectly($bookingSeat->show_seat_id);
+            }
         }
 
         return $payment->fresh();

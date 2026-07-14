@@ -33,15 +33,31 @@ class StaffService
             $role = $data['role'];
             unset($data['role']);
 
+            $allowedRoles = [
+                'company_admin' => ['branch_manager', 'ticket_counter', 'cashier'],
+                'branch_manager' => ['ticket_counter', 'cashier'],
+            ];
+
+            $currentRole = $loggedInUser->roles->first()->name;
+
+            if (isset($allowedRoles[$currentRole])) {
+                if (! in_array($role, $allowedRoles[$currentRole])) {
+                    abort(403, 'You cannot assign this role.');
+                }
+            }
             $data['password'] = Hash::make($data['password']);
 
-            $data['company_id'] = $loggedInUser->id;
+            $data['company_id'] = $loggedInUser->company_id;;
 
-           
+
             if (empty($data['cinema_id'])) {
                 $data['cinema_id'] = $loggedInUser->cinema_id;
             }
 
+            // Branch manager can only create staff in their own cinema
+            if ($loggedInUser->hasRole('branch_manager')) {
+                $data['cinema_id'] = $loggedInUser->cinema_id;
+            }
             $staff = $this->staffRepository->create($data);
 
             $staff->employee_code = $this->generateEmployeeCode($staff->id);

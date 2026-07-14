@@ -66,7 +66,7 @@ class ShowSeatService
     {
         return DB::transaction(function () use ($showSeatId, $userId) {
 
-        
+
             $seat = $this->findSeatForUpdate($showSeatId);
 
             $this->releaseExpiredLock($seat);
@@ -82,7 +82,6 @@ class ShowSeatService
             ]);
 
             return $seat->fresh();
-
         }, 3);
     }
 
@@ -119,7 +118,43 @@ class ShowSeatService
             return $seat->fresh();
         });
     }
+    public function bookDirectly(int $showSeatId): ShowSeat
+    {
+        return DB::transaction(function () use ($showSeatId) {
 
+            $seat = $this->findSeatForUpdate($showSeatId);
+
+
+            if ($seat->status === ShowSeat::BOOKED) {
+
+                throw new ConflictHttpException(
+                    'Seat already booked.'
+                );
+            }
+
+
+            if ($seat->status === ShowSeat::BLOCKED) {
+
+                throw new ConflictHttpException(
+                    'Seat is blocked.'
+                );
+            }
+
+
+            $this->showSeatRepository->update($seat, [
+
+                'status' => ShowSeat::BOOKED,
+
+                'locked_by' => null,
+
+                'locked_until' => null,
+
+            ]);
+
+
+            return $seat->fresh();
+        });
+    }
     /*
     |--------------------------------------------------------------------------
     | Validation Helpers

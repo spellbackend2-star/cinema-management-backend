@@ -220,25 +220,49 @@ class ShowScheduleService
      */
     private function checkScheduleConflict(array $data, $ignoreId = null)
     {
-        $exists = ShowSchedule::where('screen_id', $data['screen_id'])
-            ->where(function ($query) use ($data) {
-                $query->whereBetween('start_date', [
-                    $data['start_date'],
-                    $data['end_date'],
-                ])->orWhereBetween('end_date', [
-                    $data['start_date'],
-                    $data['end_date'],
-                ]);
+        $newStartTime = Carbon::parse($data['show_time']);
+        $duration = \App\Models\Movie::findOrFail($data['movie_id'])->duration_min;
+        $newEndTime = $newStartTime->copy()->addMinutes($duration);
+
+        $query = ShowSchedule::with('movie')
+            ->where('screen_id', $data['screen_id'])
+            ->where(function ($q) use ($data) {
+                $q->whereBetween('start_date', [$data['start_date'], $data['end_date']])
+                    ->orWhereBetween('end_date', [$data['start_date'], $data['end_date']])
+                    ->orWhere(function ($q2) use ($data) {
+                        $q2->where('start_date', '<=', $data['start_date'])
+                            ->where('end_date', '>=', $data['end_date']);
+                    });
             });
 
         if ($ignoreId) {
-            $exists->where('id', '!=', $ignoreId);
+            $query->where('id', '!=', $ignoreId);
         }
 
-        if ($exists->exists()) {
-            throw new Exception(
-                "Screen already has a schedule during this period"
-            );
+        $schedules = $query->get();
+
+        foreach ($schedules as $schedule) {
+
+            // Check if any weekday matches
+            $existingDays = explode(',', $schedule->days_of_week);
+            $newDays = $data['days_of_week'];
+
+            if (empty(array_intersect($existingDays, $newDays))) {
+                continue;
+            }
+
+            $existingStart = Carbon::parse($schedule->show_time);
+            $existingEnd = $existingStart->copy()->addMinutes($schedule->movie->duration_min);
+
+            $overlap =
+                $existingStart->lt($newEndTime) &&
+                $existingEnd->gt($newStartTime);
+
+            if ($overlap) {
+                throw new Exception(
+                    'This screen already has another show during the selected time.'
+                );
+            }
         }
     }
 }

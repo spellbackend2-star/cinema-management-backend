@@ -15,39 +15,18 @@ use App\Http\Controllers\V1\LoyaltyTransactionController;
 use App\Http\Controllers\V1\PaymentGatewayController;
 use App\Http\Controllers\V1\PeopleController;
 use App\Http\Controllers\V1\RolePermissionController;
-use App\Http\Controllers\V1\ShowController;
-use App\Http\Controllers\V1\ShowPriceController;
 use App\Http\Controllers\V1\ShowScheduleController;
 use App\Http\Controllers\V1\ShowSeatController;
 use Illuminate\Support\Facades\Route;
 
 
-
 Route::prefix('v1')->group(function () {
 
-    // Public auth routes
-    Route::post('/register', [AuthController::class, 'register']);
-    Route::post('/login', [AuthController::class, 'login']);
+    
 
-
-
-    Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
-    Route::post('/reset-password', [AuthController::class, 'resetPassword']);
-    Route::get('/payments/esewa/success', [PaymentGatewayController::class, 'success'])
-        ->name('payments.esewa.success');
-
-    Route::get('/payments/esewa/failure', [PaymentGatewayController::class, 'failure'])
-        ->name('payments.esewa.failure');
-
-
-    Route::get(
-        'payments/khalti/verify/{payment}',
-        [PaymentGatewayController::class, 'verifyKhalti']
-    )->name('payments.khalti.verify');
-
+    
     Route::middleware(['auth:api', 'role:company_admin|branch_manager'])->group(function () {
 
-        Route::get('/profile', [AuthController::class, 'profile']);
 
         Route::post('/logout', [AuthController::class, 'logout']);
 
@@ -76,7 +55,6 @@ Route::prefix('v1')->group(function () {
         ->group(function () {
 
             // Movies
-            Route::get('/movies', [MovieController::class, 'index']);
             // Screens
             Route::get('/public/screens', [ScreenController::class, 'index']);
             Route::get('coupons', [CouponController::class, 'index']);
