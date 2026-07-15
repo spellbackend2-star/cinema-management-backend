@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Repositories\Interfaces\MovieRepositoryInterface;
+use Illuminate\Support\Facades\Storage;
 
 class MovieService
 {
@@ -22,7 +23,13 @@ class MovieService
 
     public function store(array $data)
     {
+        if (isset($data['poster_url'])) {
+            $data['poster_url'] = $data['poster_url']->store('movies/posters', 'public');
+        }
 
+        if (isset($data['banner_url'])) {
+            $data['banner_url'] = $data['banner_url']->store('movies/banners', 'public');
+        }
         $movie = $this->repository->create($data);
 
 
@@ -57,7 +64,7 @@ class MovieService
             $movie->people()->sync($people);
         }
 
-        return $movie->load('genres', 'languages','people');
+        return $movie->load('genres', 'languages', 'people');
     }
 
 
@@ -70,7 +77,23 @@ class MovieService
 
     public function update(int $id, array $data)
     {
+        $movie = $this->repository->findById($id);
 
+        if (isset($data['poster_url'])) {
+            if ($movie->poster_url && Storage::disk('public')->exists($movie->poster_url)) {
+                Storage::disk('public')->delete($movie->poster_url);
+            }
+
+            $data['poster_url'] = $data['poster_url']->store('movies/posters', 'public');
+        }
+
+        if (isset($data['banner_url'])) {
+            if ($movie->banner_url && Storage::disk('public')->exists($movie->banner_url)) {
+                Storage::disk('public')->delete($movie->banner_url);
+            }
+
+            $data['banner_url'] = $data['banner_url']->store('movies/banners', 'public');
+        }
 
         $movie = $this->repository->update($id, $data);
 

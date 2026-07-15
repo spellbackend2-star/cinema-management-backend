@@ -61,4 +61,8 @@ class User extends Authenticatable
             Booking::class
         );
     }
+
+    public function payments(){
+        return $this->hasMany(Payment::class);
+    }
 }

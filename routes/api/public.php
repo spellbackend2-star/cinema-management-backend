@@ -8,7 +8,7 @@ use App\Http\Controllers\V1\ShowScheduleController;
 use App\Http\Controllers\V1\ShowSeatController;
 
 
-Route::prefix('v1')->group(function () {
+
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
@@ -31,4 +31,3 @@ Route::post('/reset-password', [AuthController::class, 'resetPassword']);
     // Seat availability
     Route::get('/show-seats', [ShowSeatController::class, 'index']);
     
-});

@@ -14,13 +14,14 @@ class Refund extends Model
         'reason',
         'status',
         'processed_by_user_id',
-        'processed_at'
+        'processed_at',
+        'system_response'
 
     ];
 
 
     protected $casts = [
-
+        'amount' => 'decimal:2',
         'processed_at' => 'datetime'
 
     ];

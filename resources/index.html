@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>eSewa Test</title>
+</head>
+<body>
+
+<form id="esewaForm" action="https://rc-epay.esewa.com.np/api/epay/main/v2/form" method="POST">
+
+    <input type="hidden" name="amount" value="400">
+    <input type="hidden" name="tax_amount" value="0">
+    <input type="hidden" name="total_amount" value="400">
+    <input type="hidden" name="product_service_charge" value="0">
+    <input type="hidden" name="product_delivery_charge" value="0">
+
+    <input type="hidden" name="transaction_uuid" value="PAY-VR47CLLQ">
+
+    <input type="hidden" name="product_code" value="EPAYTEST">
+
+    <input type="hidden" name="success_url" value="http://127.0.0.1:8000/api/v1/payments/esewa/success">
+
+    <input type="hidden" name="failure_url" value="http://127.0.0.1:8000/api/v1/payments/esewa/failure">
+
+    <input type="hidden" name="signed_field_names" value="total_amount,transaction_uuid,product_code">
+
+    <input type="hidden" name="signature" value="cWjHOayQMUyEEoCdp3a/hCHXDaZN9g3+E83DRTPdMy0=">
+
+
+
+    <button type="submit">
+        Pay with eSewa
+    </button>
+
+</form>
+
+</body>
+</html>

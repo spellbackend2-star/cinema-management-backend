@@ -24,7 +24,7 @@ class PaymentIndexRequest extends FormRequest
 
             'payment_method' => [
                 'nullable',
-                'in:cash,khalti,esewa'
+                'in:CASH,KHALTI,ESEWA'
             ],
 
 

@@ -9,8 +9,7 @@ class StaffRepository implements StaffRepositoryInterface
 {
     public function index(array $filters)
     {
-        $query = User::with(['roles', 'company', 'cinema'])
-            ->whereNotNull('parent_id');
+        $query = User::with(['roles', 'company', 'cinema']);
 
         if (!empty($filters['company_id'])) {
             $query->where('company_id', $filters['company_id']);

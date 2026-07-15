@@ -16,7 +16,7 @@ class ShowSeatRepository implements ShowSeatRepositoryInterface
     public function getAll(int $perPage = 10): LengthAwarePaginator
     {
         return $this->model
-            ->with(['show', 'seat', 'locker'])
+            ->with(['show', 'seat', 'lockedBy'])
             ->paginate($perPage);
     }
 

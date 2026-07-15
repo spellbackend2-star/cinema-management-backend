@@ -29,8 +29,7 @@ class StaffResource extends JsonResource
 
             'roles' => $this->whenLoaded('roles', fn () => $this->getRoleNames()),
 
-            'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
-            'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
+           
         ];
     }
 }

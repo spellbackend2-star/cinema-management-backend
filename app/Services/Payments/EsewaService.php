@@ -39,17 +39,18 @@ class EsewaService
             ],
         ];
     }
-    private function generateSignature(int $totalAmount, $txn)
+    private function generateSignature(float $totalAmount, string $txn): string
     {
+
         $secret = config('services.esewa.secret');
 
-        $productCode = trim(config('services.esewa.product_code'));
-        $transactionUuid = trim($txn);
-        $totalAmount = number_format((float)$amount, 2, '.', '');
+        $productCode = config('services.esewa.product_code');
 
-        $message = "total_amount={$totalAmount},transaction_uuid={$transactionUuid},product_code={$productCode}";
+        $totalAmount = number_format($totalAmount, 2, '.', '');
 
-        // dd($secret,$message, $totalAmount, $transactionUuid, );
+        $message = "total_amount={$totalAmount},transaction_uuid={$txn},product_code={$productCode}";
+
+       
         return base64_encode(
             hash_hmac('sha256', $message, $secret, true)
         );
@@ -73,10 +74,9 @@ class EsewaService
 
         // Match payment_references with transaction_uuid
         $payment = Payment::where(
-            'payment_references',
+            'transaction_id',
             $decoded['transaction_uuid']
         )->first();
-
         if (!$payment) {
             throw new \Exception('Payment not found.');
         }
@@ -86,7 +86,7 @@ class EsewaService
             throw new \Exception('Payment amount mismatch.');
         }
         // Already processed
-        if ($payment->payment_status === 'completed') {
+        if ($payment->status === 'SUCCESS') {
 
             return [
                 'status' => 'Completed',
@@ -97,7 +97,7 @@ class EsewaService
         $response = Http::get(
             "{$this->baseUrl}/transaction/status/",
             [
-                'product_code'     => $this->productCode,
+                'product_code' => config('services.esewa.product_code'),
                 'total_amount'     => $decoded['total_amount'],
                 'transaction_uuid' => $decoded['transaction_uuid'],
             ]
@@ -112,22 +112,21 @@ class EsewaService
         if (($verify['status'] ?? '') !== 'COMPLETE') {
 
             $payment->update([
-                'payment_status' => 'failed'
+                'status' => 'FAILED'
             ]);
 
             throw new \Exception('Payment not completed.');
         }
 
         $payment->update([
-            'payment_status' => 'completed',
-            'transaction_id' => $verify['transaction_code'],
-            'payment_date'   => now(),
+            'status' => 'SUCCESS',
+            'paid_at' => now(),
+            'gateway_reference' => $verify['transaction_code'] ?? null,
         ]);
-
-        $payment->tourBooking?->update([
-            'status' => 'confirmed',
+        $payment->booking?->update([
+            'status' => 'CONFIRMED',
+            'payment_status' => 'PAID',
         ]);
-
         return [
             'status' => 'Completed',
             'transaction_id' => $payment->transaction_id,

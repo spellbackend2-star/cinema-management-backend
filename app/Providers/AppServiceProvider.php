@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
-
+use App\Models\Payment;
+use App\Models\Refund;
+use App\Policies\RefundPolicy;
 use App\Repositories\Eloquent\CompanyRepository;
 use App\Repositories\Eloquent\AuthRepository;
 use App\Repositories\Eloquent\BookingRepository;
@@ -12,6 +14,7 @@ use App\Repositories\Eloquent\LoyaltyAccountRepository;
 use App\Repositories\Eloquent\LoyaltyTransactionRepository;
 use App\Repositories\Eloquent\MovieRepository;
 use App\Repositories\Eloquent\PaymentRepository;
+use App\Repositories\Eloquent\RefundRepository;
 use App\Repositories\Eloquent\RolePermissionRepository;
 use App\Repositories\Eloquent\ScreenRepository;
 use App\Repositories\Eloquent\SeatCategoryRepository;
@@ -31,6 +34,7 @@ use App\Repositories\Interfaces\LoyaltyAccountRepositoryInterface;
 use App\Repositories\Interfaces\LoyaltyTransactionRepositoryInterface;
 use App\Repositories\Interfaces\MovieRepositoryInterface;
 use App\Repositories\Interfaces\PaymentRepositoryInterface;
+use App\Repositories\Interfaces\RefundRepositoryInterface;
 use App\Repositories\Interfaces\RolePermissionRepositoryInterface;
 use App\Repositories\Interfaces\ScreenRepositoryInterface;
 use App\Repositories\Interfaces\SeatCategoryRepositoryInterface;
@@ -41,6 +45,7 @@ use App\Repositories\Interfaces\ShowScheduleRepositoryInterface;
 use App\Repositories\Interfaces\ShowSeatRepositoryInterface;
 use App\Repositories\Interfaces\StaffRepositoryInterface;
 use Carbon\CarbonInterval;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 use Laravel\Passport\Passport;
 
@@ -125,6 +130,10 @@ class AppServiceProvider extends ServiceProvider
             RolePermissionRepositoryInterface::class,
             RolePermissionRepository::class
         );
+        $this->app->bind(
+            RefundRepositoryInterface::class,
+            RefundRepository::class
+        );
     }
 
 
@@ -134,6 +143,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Gate::policy(Payment::class, RefundPolicy::class);
         Passport::enablePasswordGrant();
 
         Passport::tokensExpireIn(CarbonInterval::days(30));

@@ -145,8 +145,7 @@ class PaymentRepository implements PaymentRepositoryInterface
     public function findById(int $id)
     {
         return Payment::with([
-            'user',
-            'booking',
+            'booking.user',
         ])
             ->findOrFail($id);
     }

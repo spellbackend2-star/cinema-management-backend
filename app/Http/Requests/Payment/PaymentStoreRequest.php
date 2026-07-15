@@ -24,7 +24,7 @@ class StorePaymentRequest extends FormRequest
 
             'payment_method' => [
                 'required',
-                'in:khalti,esewa'
+                'in:KHALTI,ESEWA'
             ],
 
 

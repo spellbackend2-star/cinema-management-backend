@@ -14,6 +14,7 @@ use App\Http\Controllers\V1\LoyaltyController;
 use App\Http\Controllers\V1\LoyaltyTransactionController;
 use App\Http\Controllers\V1\PaymentGatewayController;
 use App\Http\Controllers\V1\PeopleController;
+use App\Http\Controllers\V1\RefundController;
 use App\Http\Controllers\V1\RolePermissionController;
 use App\Http\Controllers\V1\ShowScheduleController;
 use App\Http\Controllers\V1\ShowSeatController;
@@ -22,9 +23,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
 
-    
 
-    
+
+
     Route::middleware(['auth:api', 'role:company_admin|branch_manager'])->group(function () {
 
 
@@ -37,6 +38,11 @@ Route::prefix('v1')->group(function () {
             Route::get('/roles', 'indexRoles');
             Route::get('/permissions', 'indexPermissions');
         });
+
+        Route::post(
+            'admin/refunds/{refund}/process',
+            [RefundController::class, 'process']
+        )->middleware('permission:refund.process');
 
         Route::apiResource('companies', CompanyController::class);
         Route::apiResource('cinemas', CinemaController::class);
@@ -57,7 +63,7 @@ Route::prefix('v1')->group(function () {
             // Movies
             // Screens
             Route::get('/public/screens', [ScreenController::class, 'index']);
-            Route::get('coupons', [CouponController::class, 'index']);
+         
 
             Route::prefix('loyalty')->group(function () {
                 Route::get('/account', [LoyaltyController::class, 'account']);

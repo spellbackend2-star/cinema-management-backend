@@ -66,8 +66,8 @@ class StoreMovieRequest extends FormRequest
 
             'censor_rating' => 'required|in:U,U/A,A,S',
 
-            'poster_url' => 'nullable|url|max:500',
-            'banner_url' => 'nullable|url|max:500',
+            'poster_url' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'banner_url' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
             'trailer_url' => 'nullable|url|max:500',
 
             'imdb_rating' => 'nullable|numeric|between:0,10',

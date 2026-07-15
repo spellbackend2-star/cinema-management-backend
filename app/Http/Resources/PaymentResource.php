@@ -18,6 +18,8 @@ class PaymentResource extends JsonResource
             'transaction_id' => $this['payment']->transaction_id,
             'payment_url' => $this['gateway']['payment_url'] ?? null,
             'pidx' => $this['gateway']['pidx'] ?? null,
+
+              'params' => $this['gateway']['params'] ?? null,
         ];
     }
 }

@@ -78,9 +78,10 @@ class PaymentService
 
         if ($payment->payment_method === 'CASH') {
 
-            $payment->update([
-                'status'  => 'SUCCESS',
-                'paid_at' => now(),
+            $booking->update([
+                'status' => 'CONFIRMED',
+                'payment_status' => 'PAID',
+                'confirmed_at' => now(),
             ]);
 
             $booking = $payment->booking()->with('bookingSeats')->first();
@@ -97,7 +98,7 @@ class PaymentService
 
             return [
                 'payment' => $payment->fresh(),
-                'status' => 'completed',
+                'status' => 'SUCCESS',
             ];
         }
 
@@ -113,8 +114,7 @@ class PaymentService
 
 
             'ESEWA' =>
-            $this->esewaService->initiate($payment),
-
+            $this->handleEsewa($payment),
 
             default =>
             throw new \Exception(
@@ -123,28 +123,39 @@ class PaymentService
         };
     }
 
+    private function handleEsewa($payment)
+    {
+        $response = $this->esewaService->initiate($payment);
 
+        $payment->update([
+            'payment_url' => $response['payment_url'],
+        ]);
+
+        return [
+            'payment' => $payment->fresh(),
+            'gateway' => $response,
+        ];
+    }
 
     public function updateStatus(int $id, string $status)
     {
         $payment = $this->paymentRepo->findById($id);
 
-        if ($payment->payment_status === 'SUCCESS') {
+        if ($payment->status === 'SUCCESS') {
             return $payment;
         }
 
         $this->paymentRepo->update($id, [
-            'payment_status' => $status,
-            'payment_date' => now(),
+            'status' => $status,
+            'paid_at' => now(),
         ]);
 
-        if ($status === 'completed') {
-
+        if ($status === 'SUCCESS') {
             $booking = $payment->booking()->with('bookingSeats')->first();
 
             $booking->update([
                 'status' => 'CONFIRMED',
-                'payment_status' => 'PAID',
+                'paid_at' => now(),
             ]);
 
             foreach ($booking->bookingSeats as $bookingSeat) {
