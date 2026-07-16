@@ -59,9 +59,8 @@ class RefundController extends Controller
     }
     public function process(ProcessRefundRequest $request,int $id)
     {
-
         $refund = $this->refundService->getById($id);
-
+        
         $this->authorize('process', $refund);
 
         $refund = $this->refundService->process($id,

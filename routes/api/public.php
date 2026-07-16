@@ -15,7 +15,6 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
-// Public movie list 
 
  // Browse cinemas
     Route::get('/cinemas', [CinemaController::class, 'index']);

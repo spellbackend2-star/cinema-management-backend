@@ -3,17 +3,25 @@
 namespace App\Services\Payments;
 
 use App\Models\Payment;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Http;
 
 class EsewaService
 {
     protected string $baseUrl;
+    protected string $productCode;
+    protected string $secret;
 
     public function __construct()
     {
-        $this->baseUrl = config('services.esewa.base_url');
-    }
+        $this->baseUrl = setting('esewa_base_url');
 
+        $this->productCode = setting('esewa_product_code');
+
+        $this->secret = Crypt::decryptString(
+            setting('esewa_secret')
+        );
+    }
 
     public function initiate(Payment $payment): array
     {
@@ -29,7 +37,7 @@ class EsewaService
                 'product_service_charge'  => 0,
                 'product_delivery_charge' => 0,
                 'transaction_uuid'        => $payment->transaction_id,
-                'product_code'            => config('services.esewa.product_code'),
+                'product_code'            => $this->productCode,
                 'success_url' => route('payments.esewa.success'),
                 'failure_url' => route('payments.esewa.failure'),
 
@@ -39,22 +47,32 @@ class EsewaService
             ],
         ];
     }
-    private function generateSignature(float $totalAmount, string $txn): string
-    {
+    private function generateSignature(
+        float $totalAmount,
+        string $txn
+    ): string {
 
-        $secret = config('services.esewa.secret');
+        $totalAmount = number_format(
+            $totalAmount,
+            2,
+            '.',
+            ''
+        );
 
-        $productCode = config('services.esewa.product_code');
+        $message =
+            "total_amount={$totalAmount},transaction_uuid={$txn},product_code={$this->productCode}";
 
-        $totalAmount = number_format($totalAmount, 2, '.', '');
 
-        $message = "total_amount={$totalAmount},transaction_uuid={$txn},product_code={$productCode}";
-
-       
         return base64_encode(
-            hash_hmac('sha256', $message, $secret, true)
+            hash_hmac(
+                'sha256',
+                $message,
+                $this->secret,
+                true
+            )
         );
     }
+
 
     public function verify(array $data): array
     {

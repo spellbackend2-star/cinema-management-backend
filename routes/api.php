@@ -16,6 +16,7 @@ use App\Http\Controllers\V1\PaymentGatewayController;
 use App\Http\Controllers\V1\PeopleController;
 use App\Http\Controllers\V1\RefundController;
 use App\Http\Controllers\V1\RolePermissionController;
+use App\Http\Controllers\v1\SettingController;
 use App\Http\Controllers\V1\ShowScheduleController;
 use App\Http\Controllers\V1\ShowSeatController;
 use Illuminate\Support\Facades\Route;
@@ -44,6 +45,8 @@ Route::prefix('v1')->group(function () {
             [RefundController::class, 'process']
         )->middleware('permission:refund.process');
 
+        Route::post('/settings/payment', [SettingController::class, 'updatePaymentSettings']);
+
         Route::apiResource('companies', CompanyController::class);
         Route::apiResource('cinemas', CinemaController::class);
         Route::apiResource('screens', ScreenController::class);
@@ -60,11 +63,6 @@ Route::prefix('v1')->group(function () {
     Route::middleware(['auth:api', 'role:customer'])
         ->group(function () {
 
-            // Movies
-            // Screens
-            Route::get('/public/screens', [ScreenController::class, 'index']);
-         
-
             Route::prefix('loyalty')->group(function () {
                 Route::get('/account', [LoyaltyController::class, 'account']);
                 Route::get('/history', [LoyaltyController::class, 'history']);
@@ -76,12 +74,7 @@ Route::prefix('v1')->group(function () {
                 Route::get('/', [LoyaltyTransactionController::class, 'index']);
                 Route::get('/{id}', [LoyaltyTransactionController::class, 'show']);
             });
-            // Seat Prices
-            Route::get('show-schedules', [ShowScheduleController::class, 'index']);
-            // Shows / Schedules
-            Route::get('show-seats', [ShowSeatController::class, 'index']);
             Route::post('/bookings', [BookingController::class, 'store']);
-            // Booking
             Route::post('payments/verify',         [PaymentGatewayController::class, 'verify']);
         });
 });

@@ -39,17 +39,17 @@ return [
         'client_secret' => env('PASSPORT_PASSWORD_CLIENT_SECRET'),
     ],
 
-    'esewa' => [
-        'merchant_code' => env('ESEWA_MERCHANT_CODE'),
-        'base_url' => env('ESEWA_BASE_URL'),
-        'product_code' => env('ESEWA_PRODUCT_CODE'),
-        'secret' => env('ESEWA_SECRET'),
-    ],
-    'khalti' => [
-        'secret_key' => env('KHALTI_SECRET_KEY'),
-        'base_url' => env(
-            'KHALTI_BASE_URL',
-            'https://a.khalti.com/api/v2'
-        ),
-    ],
+    // 'esewa' => [
+    //     'merchant_code' => env('ESEWA_MERCHANT_CODE'),
+    //     'base_url' => env('ESEWA_BASE_URL'),
+    //     'product_code' => env('ESEWA_PRODUCT_CODE'),
+    //     'secret' => env('ESEWA_SECRET'),
+    // ],
+    // 'khalti' => [
+    //     'secret_key' => env('KHALTI_SECRET_KEY'),
+    //     'base_url' => env(
+    //         'KHALTI_BASE_URL',
+    //         'https://a.khalti.com/api/v2'
+    //     ),
+    // ],
 ];
