@@ -5,35 +5,45 @@ namespace App\Repositories\Eloquent;
 use App\Models\User;
 use App\Repositories\Interfaces\StaffRepositoryInterface;
 
-class StaffRepository implements StaffRepositoryInterface
+class StaffRepository extends BaseRepository implements StaffRepositoryInterface
 {
     public function index(array $filters)
     {
         $query = User::with(['roles', 'company', 'cinema']);
 
-        if (!empty($filters['company_id'])) {
-            $query->where('company_id', $filters['company_id']);
-        }
+         // Search
+        $query = $this->applyFilter(
+            $query,
+            $filters,
+            [
+                'name',
+                'email',
+                'employee_code'
+            ]
+        );
 
-        if (!empty($filters['cinema_id'])) {
-            $query->where('cinema_id', $filters['cinema_id']);
-        }
 
+        // Exact filters
+        $query = $this->applyExactFilters(
+            $query,
+            $filters,
+            [
+                'company_id',
+                'cinema_id'
+            ]
+        );
+
+
+        // Role filter (Spatie)
         if (!empty($filters['role'])) {
             $query->role($filters['role']);
         }
 
-        if (!empty($filters['search'])) {
-            $search = $filters['search'];
 
-            $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('employee_code', 'like', "%{$search}%");
-            });
-        }
-
-        return $query->latest()->paginate($filters['per_page'] ?? 15);
+        return $this->paginate(
+            $query->latest(),
+            $filters
+        );
     }
 
     public function find(int $id): User

@@ -83,13 +83,13 @@ class PaymentService
                 'payment_status' => 'PAID',
                 'confirmed_at' => now(),
             ]);
+            $payment->update([
+                'status' => 'SUCCESS',
+                'paid_at' => now(),
+            ]);
 
             $booking = $payment->booking()->with('bookingSeats')->first();
 
-            $booking->update([
-                'status' => 'CONFIRMED',
-                'payment_status' => 'PAID',
-            ]);
 
             foreach ($booking->bookingSeats as $bookingSeat) {
                 $this->showSeatService
@@ -137,35 +137,52 @@ class PaymentService
         ];
     }
 
-    public function updateStatus(int $id, string $status)
-    {
-        $payment = $this->paymentRepo->findById($id);
+    // public function updateStatus(int $id, string $status)
+    // {
+    //     $payment = $this->paymentRepo->findById($id);
 
-        if ($payment->status === 'SUCCESS') {
-            return $payment;
-        }
+    //     if (!$payment) {
+    //         throw new \Exception('Payment not found');
+    //     }
 
-        $this->paymentRepo->update($id, [
-            'status' => $status,
-            'paid_at' => now(),
-        ]);
 
-        if ($status === 'SUCCESS') {
-            $booking = $payment->booking()->with('bookingSeats')->first();
+    //     if (strtoupper($status) === 'SUCCESS') {
 
-            $booking->update([
-                'status' => 'CONFIRMED',
-                'paid_at' => now(),
-            ]);
+    //         $payment->update([
+    //             'status' => 'SUCCESS',
+    //             'paid_at' => now(),
+    //         ]);
 
-            foreach ($booking->bookingSeats as $bookingSeat) {
-                $this->showSeatService->bookDirectly($bookingSeat->show_seat_id);
-            }
-        }
 
-        return $payment->fresh();
-    }
+    //         $booking = $payment->booking()
+    //             ->with('bookingSeats')
+    //             ->first();
 
+
+    //         $booking->update([
+    //             'status' => 'CONFIRMED',
+    //             'payment_status' => 'PAID',
+    //             'confirmed_at' => now(),
+    //         ]);
+
+
+    //         foreach ($booking->bookingSeats as $bookingSeat) {
+
+    //             $this->showSeatService
+    //                 ->bookDirectly(
+    //                     $bookingSeat->show_seat_id
+    //                 );
+    //         }
+    //     } else {
+
+    //         $payment->update([
+    //             'status' => 'FAILED'
+    //         ]);
+    //     }
+
+
+    //     return $payment->fresh();
+    // }
 
     private function handleKhalti($payment)
     {

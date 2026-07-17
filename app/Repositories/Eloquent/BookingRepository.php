@@ -15,7 +15,7 @@ class BookingRepository implements BookingRepositoryInterface
 
     public function __construct(
         protected Booking $model
-    ){}
+    ) {}
 
 
 
@@ -24,8 +24,11 @@ class BookingRepository implements BookingRepositoryInterface
         return $this->model
             ->with([
                 'user',
+                'bookedby',
                 'show',
-                'seats'
+                'seats',
+                'bookingSeats.showSeat.seat',
+                'payment'
             ])
             ->paginate($perPage);
     }
@@ -37,8 +40,12 @@ class BookingRepository implements BookingRepositoryInterface
         return $this->model
             ->with([
                 'user',
-                'show',
-                'seats'
+                'bookedBy',
+                'show.movie',
+                'show.screen',
+                'bookingSeats.showSeat.seat',
+                'payment',
+                'coupon'
             ])
             ->findOrFail($id);
     }
@@ -69,7 +76,5 @@ class BookingRepository implements BookingRepositoryInterface
     ): bool {
 
         return $booking->delete();
-
     }
-
 }

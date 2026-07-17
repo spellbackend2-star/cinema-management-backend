@@ -27,9 +27,11 @@ Route::prefix('v1')->group(function () {
 
 
 
-    Route::middleware(['auth:api', 'role:company_admin|branch_manager'])->group(function () {
+    Route::middleware(['auth:api', 'role:company_admin|branch_manager|cashier|ticket_counter'])->group(function () {
 
-
+        Route::get('admin-bookings', [BookingController::class, 'index']);
+        Route::get('admin-bookings/{id}', [BookingController::class, 'show']);
+        Route::post('/admin/bookings', [BookingController::class, 'store']);
         Route::post('/logout', [AuthController::class, 'logout']);
 
         Route::controller(RolePermissionController::class)->prefix('role-permissions')->group(function () {
@@ -74,7 +76,11 @@ Route::prefix('v1')->group(function () {
                 Route::get('/', [LoyaltyTransactionController::class, 'index']);
                 Route::get('/{id}', [LoyaltyTransactionController::class, 'show']);
             });
-            Route::post('/bookings', [BookingController::class, 'store']);
+            Route::post('/my-bookings', [BookingController::class, 'store']);
+
+
+
+
             Route::post('payments/verify',         [PaymentGatewayController::class, 'verify']);
         });
 });

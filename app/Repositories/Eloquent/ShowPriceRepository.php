@@ -3,9 +3,10 @@
 namespace App\Repositories\Eloquent;
 
 use App\Models\ShowPrice;
+use App\Repositories\BaseRepository;
 use App\Repositories\Interfaces\ShowPriceRepositoryInterface;
 
-class ShowPriceRepository implements ShowPriceRepositoryInterface
+class ShowPriceRepository extends BaseRepository implements ShowPriceRepositoryInterface
 {
     public function index(array $filters = [])
     {

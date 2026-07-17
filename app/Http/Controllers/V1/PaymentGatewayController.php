@@ -24,14 +24,14 @@ class PaymentGatewayController extends Controller
 
 
         return match ($payment->payment_method) {
-            'khalti' => $this->khaltiService->initiate($payment),
-             'esewa'  => $this->esewaService->initiate($payment),
+            'KHALTI' => $this->khaltiService->initiate($payment),
+            'ESEWA'  => $this->esewaService->initiate($payment),
             default  => throw new \Exception('Unsupported payment method'),
         };
     }
 
 
-     public function verifyKhalti(Payment $payment)
+    public function verifyKhalti(Payment $payment)
     {
         try {
 
@@ -56,7 +56,7 @@ class PaymentGatewayController extends Controller
     public function verify(Request $request)
     {
 
-    
+
         try {
 
             $data = $request->input('data') ?? $request->query('data');
@@ -89,14 +89,14 @@ class PaymentGatewayController extends Controller
 
     public function success(Request $request)
     {
-        
+
         try {
             $result = $this->esewaService->verify([
                 'data' => $request->input('data') ?? $request->query('data')
             ]);
 
 
-          
+
             return response()->json([
                 'success' => true,
                 'message' => 'Payment verified successfully.',
@@ -118,5 +118,4 @@ class PaymentGatewayController extends Controller
             'message' => 'Payment was cancelled or failed.',
         ], 400);
     }
-   
 }

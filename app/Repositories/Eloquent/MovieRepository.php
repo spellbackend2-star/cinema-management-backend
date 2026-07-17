@@ -3,9 +3,10 @@
 namespace App\Repositories\Eloquent;
 
 use App\Models\Movie;
+use App\Repositories\BaseRepository;
 use App\Repositories\Interfaces\MovieRepositoryInterface;
 
-class MovieRepository implements MovieRepositoryInterface
+class MovieRepository extends BaseRepository  implements MovieRepositoryInterface
 {
 
     public function index(array $filters = [])
@@ -18,16 +19,28 @@ class MovieRepository implements MovieRepositoryInterface
             ]);
 
 
-        if (!empty($filters['search'])) {
-            $query->where('title', 'LIKE', '%' . $filters['search'] . '%');
-        }
+        // Search filter
+        $query = $this->applyFilter(
+            $query,
+            $filters,
+            [
+                'title',
+                'description'
+            ]
+        );
 
 
-        if (!empty($filters['status'])) {
-            $query->where('status', $filters['status']);
-        }
+        // Exact filters
+        $query = $this->applyExactFilters(
+            $query,
+            $filters,
+            [
+                'status'
+            ]
+        );
 
 
+        // Release date filter
         if (!empty($filters['release_date'])) {
             $query->whereDate(
                 'release_date',
@@ -36,8 +49,9 @@ class MovieRepository implements MovieRepositoryInterface
         }
 
 
-        return $query->latest()->paginate(
-            $filters['per_page'] ?? 10
+        return $this->paginate(
+            $query->latest(),
+            $filters
         );
     }
 
@@ -56,7 +70,7 @@ class MovieRepository implements MovieRepositoryInterface
 
     public function create(array $data)
     {
-       
+
         return Movie::create($data);
     }
 

@@ -15,15 +15,18 @@ class IndexBookingRequest extends FormRequest
     public function rules(): array
     {
         return [
-
+            'customer_id' => [
+                'nullable',
+                'exists:users,id',
+            ],
             'show_id' => [
-                'required',
+                'nullable',
                 'exists:shows,id'
             ],
 
 
             'show_seat_ids' => [
-                'required',
+                'nullable',
                 'array',
                 'min:1'
             ],

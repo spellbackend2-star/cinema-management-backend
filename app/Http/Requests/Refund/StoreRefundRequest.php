@@ -15,7 +15,7 @@ class StoreRefundRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'payment_id' => ['required', 'exists:payments,id'],
+
             'amount' => ['required', 'numeric', 'gt:0'],
             'reason' => ['nullable', 'string', 'max:1000'],
         ];

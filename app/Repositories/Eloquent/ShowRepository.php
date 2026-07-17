@@ -3,6 +3,7 @@
 namespace App\Repositories\Eloquent;
 
 use App\Models\Show;
+use App\Repositories\BaseRepository;
 use App\Repositories\Interfaces\ShowRepositoryInterface;
 
 class ShowRepository implements ShowRepositoryInterface{
@@ -18,29 +19,41 @@ class ShowRepository implements ShowRepositoryInterface{
             ]);
 
 
-        if (!empty($filters['movie_id'])) {
-            $query->where('movie_id', $filters['movie_id']);
-        }
+         // Search movie title
+        $query = $this->applyFilter(
+            $query,
+            $filters,
+            [
+                'status'
+            ]
+        );
 
 
-        if (!empty($filters['screen_id'])) {
-            $query->where('screen_id', $filters['screen_id']);
-        }
+        // Exact filters
+        $query = $this->applyExactFilters(
+            $query,
+            $filters,
+            [
+                'movie_id',
+                'screen_id',
+                'status'
+            ]
+        );
 
 
+        // Date filter
         if (!empty($filters['date'])) {
-            $query->whereDate('start_time', $filters['date']);
+            $query->whereDate(
+                'start_time',
+                $filters['date']
+            );
         }
 
 
-        if (!empty($filters['status'])) {
-            $query->where('status', $filters['status']);
-        }
-
-
-        return $query
-            ->orderBy('start_time')
-            ->paginate();
+        return $this->paginate(
+            $query->orderBy('start_time'),
+            $filters
+        );
     }
 
 

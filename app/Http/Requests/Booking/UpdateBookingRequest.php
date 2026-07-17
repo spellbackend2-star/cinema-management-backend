@@ -16,7 +16,10 @@ class UpdateBookingRequest extends FormRequest
     public function rules(): array
     {
         return [
-
+            'customer_id' => [
+                'nullable',
+                'exists:users,id',
+            ],
             'coupon_id' => [
                 'nullable',
                 'exists:coupons,id'

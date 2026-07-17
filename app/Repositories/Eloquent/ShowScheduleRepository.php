@@ -5,7 +5,7 @@ namespace App\Repositories\Eloquent;
 use App\Models\ShowSchedule;
 use App\Repositories\Interfaces\ShowScheduleRepositoryInterface;
 
-class ShowScheduleRepository implements ShowScheduleRepositoryInterface
+class ShowScheduleRepository extends BaseRepository implements ShowScheduleRepositoryInterface
 {
     public function index(array $filters = [])
     {
@@ -15,24 +15,35 @@ class ShowScheduleRepository implements ShowScheduleRepositoryInterface
             'language',
         ]);
 
-        if (!empty($filters['movie_id'])) {
-            $query->where('movie_id', $filters['movie_id']);
-        }
+       // Search
+        $query = $this->applyFilter(
+            $query,
+            $filters,
+            [
+                'name'
+            ]
+        );
 
-        if (!empty($filters['screen_id'])) {
-            $query->where('screen_id', $filters['screen_id']);
-        }
 
-        if (!empty($filters['language_id'])) {
-            $query->where('language_id', $filters['language_id']);
-        }
+        // Exact filters
+        $query = $this->applyExactFilters(
+            $query,
+            $filters,
+            [
+                'movie_id',
+                'screen_id',
+                'language_id',
+                'is_active'
+            ]
+        );
 
-        if (isset($filters['is_active'])) {
-            $query->where('is_active', $filters['is_active']);
-        }
 
-        return $query->latest()->paginate(10);
+        return $this->paginate(
+            $query->latest(),
+            $filters
+        );
     }
+
 
     public function find(int $id)
     {

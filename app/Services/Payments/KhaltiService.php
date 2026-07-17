@@ -87,7 +87,10 @@ class KhaltiService
             ]);
 
             $payment->booking?->update([
-                'status' => 'confirmed',
+
+                'status' => 'CONFIRMED',
+                'payment_status' => 'PAID',
+                'confirmed_at' => now(),
             ]);
         } elseif (($result['status'] ?? '') === 'Pending') {
 

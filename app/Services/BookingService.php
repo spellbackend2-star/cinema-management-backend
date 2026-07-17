@@ -32,32 +32,34 @@ class BookingService
 
 
 
-    public function store(array $data, int $userId)
+    public function store(array $data, int $userId, $authUser)
     {
-        return DB::transaction(function () use ($data, $userId) {
+        return DB::transaction(function () use ($data, $userId, $authUser) {
 
+            $isStaffBooking = $authUser->hasAnyRole([
+                'ticket_counter',
+                'cashier',
+                'company_admin',
+                'branch_manager'
+            ]);
 
-            /*
-            |--------------------------------------------------------------------------
-            | 1. Lock Seats
-            |--------------------------------------------------------------------------
-            */
-
+            if ($isStaffBooking) {
+                $bookingUserId = $data['customer_id'];
+                $bookedByStaffId = $userId;
+            } else {
+                $bookingUserId = $userId;
+                $bookedByStaffId = null;
+            }
             foreach ($data['show_seat_ids'] as $seatId) {
 
                 $this->showSeatService->lockSeat(
                     $seatId,
-                    $userId
+                    $bookingUserId
                 );
             }
 
 
 
-            /*
-            |--------------------------------------------------------------------------
-            | 2. Get Seat Prices
-            |--------------------------------------------------------------------------
-            */
 
             $showSeats = ShowSeat::whereIn(
                 'id',
@@ -69,11 +71,6 @@ class BookingService
 
 
 
-            /*
-            |--------------------------------------------------------------------------
-            | 3. Calculate Amount
-            |--------------------------------------------------------------------------
-            */
 
             $taxAmount = 0;
 
@@ -89,13 +86,9 @@ class BookingService
                 - $discountAmount;
 
 
-
-            /*
-            |--------------------------------------------------------------------------
-            | 4. Create Booking
-            |--------------------------------------------------------------------------
-            */
-
+            if ($isStaffBooking && !isset($data['customer_id'])) {
+                throw new \Exception('Customer is required for counter booking');
+            }
 
             $booking = $this->repository->create([
 
@@ -103,7 +96,8 @@ class BookingService
                 'BK-' . now()->format('Ymd') . '-' . strtoupper(str()->random(5)),
 
 
-                'user_id' => $userId,
+                'user_id' => $bookingUserId,
+                'booked_by_user_id' => $bookedByStaffId,
 
                 'show_id' => $data['show_id'],
 
@@ -119,27 +113,26 @@ class BookingService
                 'total_amount' => $totalAmount,
 
 
-                'status' => 'PENDING',
+                'status' => $isStaffBooking
+                    ? 'CONFIRMED'
+                    : 'PENDING',
 
-                'payment_status' => 'UNPAID',
+                'payment_status' => ($isStaffBooking &&
+                    ($data['payment_method'] ?? null) === 'CASH')
+                    ? 'PAID'
+                    : 'UNPAID',
 
-                'booking_source' =>
-                $data['booking_source'] ?? 'WEB',
+                'booking_source' => $isStaffBooking
+                    ? 'COUNTER'
+                    : ($data['booking_source'] ?? 'WEB'),
 
-
-                'expires_at' =>
-                now()->addMinutes(1)
-
+                'expires_at' => $isStaffBooking
+                    ? null
+                    : now()->addMinutes(5),
             ]);
 
 
 
-
-            /*
-            |--------------------------------------------------------------------------
-            | 5. Attach Seats
-            |--------------------------------------------------------------------------
-            */
 
 
             foreach ($showSeats as $seat) {
@@ -163,13 +156,6 @@ class BookingService
                 ]);
             }
 
-
-
-            /*
-            |--------------------------------------------------------------------------
-            | 6. Create Payment
-            |--------------------------------------------------------------------------
-            */
 
 
             $payment = $this->paymentService

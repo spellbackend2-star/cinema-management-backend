@@ -12,19 +12,43 @@ class SeatCategoryRepository extends BaseRepository implements SeatCategoryRepos
     {
         $query = SeatCategory::with('screen');
 
-        if (!empty($filters['screen_id'])) {
-            $query->where('screen_id', $filters['screen_id']);
-        }
-        if (!empty($filters['company_id'])) {
-        $query->whereHas('screen', function ($q) use ($filters) {
-            $q->where('company_id', $filters['company_id']);
-        });
-    }
+        // Search filter
+        $query = $this->applyFilter(
+            $query,
+            $filters,
+            [
+                'name'
+            ]
+        );
 
-        return $query
-            ->orderBy('display_order')
-            ->latest()
-            ->paginate($filters['per_page'] ?? 10);
+
+        // Exact filter
+        $query = $this->applyExactFilters(
+            $query,
+            $filters,
+            [
+                'screen_id'
+            ]
+        );
+
+        // Company filter through relation
+        if (!empty($filters['company_id'])) {
+
+            $query->whereHas('screen', function ($q) use ($filters) {
+                $q->where(
+                    'company_id',
+                    $filters['company_id']
+                );
+            });
+        }
+
+
+        return $this->paginate(
+            $query
+                ->orderBy('display_order')
+                ->latest(),
+            $filters
+        );
     }
 
     public function find(int $id)

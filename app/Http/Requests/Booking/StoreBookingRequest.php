@@ -14,8 +14,13 @@ class StoreBookingRequest extends FormRequest
 
     public function rules(): array
     {
+
         return [
 
+            'customer_id' => [
+                'nullable',
+                'exists:users,id',
+            ],
             'show_id' => [
                 'required',
                 'exists:shows,id'

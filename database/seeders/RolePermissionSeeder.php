@@ -117,7 +117,13 @@ class RolePermissionSeeder extends Seeder
             'staff.create',
             'staff.update',
             'staff.delete',
-            'refund.process'
+            'booking.show',
+            'refund.process',
+            'booking.create',
+            'booking.view',
+            'booking.update',
+            'booking.delete'
+
         ];
 
         foreach ($allPermissions as $permission) {
@@ -208,11 +214,18 @@ class RolePermissionSeeder extends Seeder
                 'show-seat.update',
                 'show-seat.delete',
                 'payment.create',
+                'booking.show',
                 'refund.process',
                 'coupon.view',
                 'loyaltyTransaction.view',
                 'loyalty.view',
-                'loyalty.create'
+                'loyalty.create',
+                'booking.view',
+                'booking.create',
+                'booking.view',
+                'booking.update',
+                'booking.delete'
+
             ],
 
             'branch_manager' => [
@@ -248,6 +261,10 @@ class RolePermissionSeeder extends Seeder
                 'cast.create',
                 'cast.update',
                 'cast.delete',
+                'booking.create',
+                'booking.view',
+                'booking.update',
+                'booking.delete',
                 'director.view',
                 'director.create',
                 'director.update',
@@ -288,6 +305,7 @@ class RolePermissionSeeder extends Seeder
                 'showschedule.create',
                 'showschedule.update',
                 'showschedule.delete',
+                'booking.show',
                 'payment.create',
                 'refund.process',
                 'loyalty.view',
@@ -308,7 +326,12 @@ class RolePermissionSeeder extends Seeder
                 'refund.process',
                 'coupon.view',
                 'loyaltyTransaction.view',
-                'loyalty.view'
+                'loyalty.view',
+                'booking.show',
+                'booking.create',
+                'booking.view',
+                'booking.update',
+                'booking.delete'
             ],
 
             'cashier' => [
@@ -322,6 +345,11 @@ class RolePermissionSeeder extends Seeder
                 'refund.process',
                 'coupon.view',
                 'loyalty.view',
+                'booking.create',
+                'booking.view',
+                'booking.update',
+                'booking.show',
+                'booking.delete',
                 'loyaltyTransaction.view'
 
             ],
@@ -336,6 +364,10 @@ class RolePermissionSeeder extends Seeder
                 'ticket.view',
                 'ticket.download',
                 'profile.view',
+                'booking.show',
+                'booking.view',
+                'booking.update',
+                'booking.delete',
                 'profile.update',
                 'show.view',
                 'coupon.view',
